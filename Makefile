@@ -7,7 +7,7 @@ build: clean venv
 	mkdir -p gen
 	. /tmp/redpanda-property-extractor-venv/bin/activate; ./property_extractor.py --recursive --path /tmp/redpanda --output gen/properties-output.json
 	make clean
-	@echo "File generated at $(pwd)/gen/properties-output.json"
+	@echo "File generated at ./gen/properties-output.json"
 
 venv: requirements.txt
 	python3 -m venv /tmp/redpanda-property-extractor-venv
