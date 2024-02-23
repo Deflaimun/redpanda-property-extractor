@@ -2,6 +2,7 @@ from file_pair import FilePair
 from tree_sitter import Language
 from property_bag import PropertyBag
 from copy import deepcopy
+import itertools as it
 import re
 # Temp
 import sys
@@ -76,11 +77,11 @@ def __unquote_string(value):
     escaped_quotes_placeholder = '$$$___quote___$$$'
     return re.sub(r'^R?"([^"]*)"\s*$', '\\1', re.sub('\\\\"', escaped_quotes_placeholder, value.strip().replace('\\\\"', escaped_quotes_placeholder))).replace(escaped_quotes_placeholder, '"')
 
-def __normalize_string(value):
+def normalize_string(value):
     return __unquote_string(value)
 
 def __normalize_concatenated_string(value):
-    return ''.join(__unquote_string(s) for s in value.split("\n"))
+    return ''.join(__unquote_string(s) for s in it.filterfalse(lambda r: re.search('^//', r),  value.split("\n")))
 
 
 
@@ -110,8 +111,11 @@ def __normalize_initializer_list(value, node, treesitter_parser, cpp_language, s
 
 
 def __normalize_param(param, node, treesitter_parser, cpp_language, source_code):
+    if param['type'] == 'comment':
+        return
+
     if param['type'] == 'string_literal' or param['type'] == 'raw_string_literal':
-        param['value'] = __normalize_string(param['value'])
+        param['value'] = normalize_string(param['value'])
     elif param['type'] == 'concatenated_string':
         param['value'] = __normalize_concatenated_string(param['value'])
         param['type'] = 'string_literal'
@@ -152,7 +156,10 @@ def parse_cpp_source(treesitter_parser, cpp_language, source_code):
             state = 'read_parameters'
         elif state == 'read_parameters':
             param = dict(value=node.text.decode("utf-8"), type=node.type)
-            parameters[current_parameter]['params'].append(__normalize_param(param, node, treesitter_parser, cpp_language, source_code))
+            normalized_param = __normalize_param(param, node, treesitter_parser, cpp_language, source_code)
+
+            if normalized_param:
+                parameters[current_parameter]['params'].append(normalized_param)
 
     return parameters
 

@@ -216,7 +216,7 @@
         ]
     },
     "retention_duration_property": {
-        "defined_in": "https://github.com/redpanda-data/redpanda/blob/dev/src/v/config/property.h#L869",
+        "defined_in": "https://github.com/redpanda-data/redpanda/blob/dev/src/v/config/property.h#L689",
         "type": "integer",
         "minimum": -2147483648,
         "maximum": 2147483647

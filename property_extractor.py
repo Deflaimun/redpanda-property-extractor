@@ -78,6 +78,7 @@ def transform_files_with_properties(files_with_properties):
         IsSecretTransformer(),
         NumericBoundsTransformer(type_transformer),
         DurationBoundsTransformer(type_transformer),
+        SimpleDefaultValuesTransformer()
     ]
 
     all_properties = PropertyBag()

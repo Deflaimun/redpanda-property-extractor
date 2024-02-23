@@ -1,5 +1,6 @@
 import re
 from property_bag import PropertyBag
+from parser import normalize_string
 
 class BasicInfoTransformer:
     def accepts(self, info, file_pair):
@@ -169,3 +170,53 @@ class DurationBoundsTransformer:
         if duration_type in type_mapping:
             property['minimum'] = type_mapping[duration_type][0]
             property['maximum'] = type_mapping[duration_type][1]
+
+class SimpleDefaultValuesTransformer:
+    def accepts(self, info, file_pair):
+        # the default value is the 4th param
+        return info['params'] and len(info['params']) > 3
+
+    def parse(self, property, info, file_pair):
+        default = info['params'][3]['value']
+
+        # handle simple cases
+        if default == 'std::nullopt':
+            property['default'] = None
+        elif default == '{}':
+            pass
+        elif isinstance(default, PropertyBag):
+            property['default'] = default
+        elif re.search("^-?[0-9][0-9']*$", default): # integers
+            property['default'] = int(default.replace('[^0-9-]', ''))
+        elif re.search("^-?[0-9]+(\.[0-9]+)$", default): # floats
+            property['default'] = float(default.replace('[^0-9]', ''))
+        elif re.search("^(true|false)$", default): # boolean
+            property['default'] = True if default == 'true' else False
+        elif re.search('^{[^:]+$', default): # string list
+            property['default'] =[normalize_string(s) for s in re.sub('{([^}]+)}', '\\1', default).split(",")]
+        else:
+            # sizes
+            matches = re.search('^([0-9]+)_(.)iB$', default)
+            if (matches):
+                size = int(matches.group(1))
+                unit = matches.group(2)
+                if unit == 'K':
+                    size = size * 1024
+                if unit == 'M':
+                    size = size * 1024 ** 2
+                if unit == 'G':
+                    size = size * 1024 ** 3
+                if unit == 'T':
+                    size = size * 1024 ** 4
+                if unit == 'P':
+                    size = size * 1024 ** 5
+
+                property['default'] = size
+            elif re.search('^(https|/[^/])', default): #urls and paths
+                property['default'] = default
+            else:
+                # ignoring numbers (they are durations if they reached here), enums (::), or default initializations (e.g. tls_config())
+                if not re.search('([0-9]|::|\\()', default):
+                    property['default'] = default
+                else:
+                    pass #handle other cases
