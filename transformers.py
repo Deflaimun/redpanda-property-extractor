@@ -190,29 +190,29 @@ class SimpleDefaultValuesTransformer:
             property['default'] = int(default.replace('[^0-9-]', ''))
         elif re.search("^-?[0-9]+(\.[0-9]+)$", default): # floats
             property['default'] = float(default.replace('[^0-9]', ''))
-        elif re.search("^(true|false)$", default): # boolean
+        elif re.search("^(true|false)$", default): # booleans
             property['default'] = True if default == 'true' else False
-        elif re.search('^{[^:]+$', default): # string list
-            property['default'] =[normalize_string(s) for s in re.sub('{([^}]+)}', '\\1', default).split(",")]
+        elif re.search('^{[^:]+$', default): # string lists
+            property['default'] = [normalize_string(s) for s in re.sub('{([^}]+)}', '\\1', default).split(",")]
         else:
-            # sizes
+            # file sizes
             matches = re.search('^([0-9]+)_(.)iB$', default)
             if (matches):
                 size = int(matches.group(1))
                 unit = matches.group(2)
                 if unit == 'K':
                     size = size * 1024
-                if unit == 'M':
+                elif unit == 'M':
                     size = size * 1024 ** 2
-                if unit == 'G':
+                elif unit == 'G':
                     size = size * 1024 ** 3
-                if unit == 'T':
+                elif unit == 'T':
                     size = size * 1024 ** 4
-                if unit == 'P':
+                elif unit == 'P':
                     size = size * 1024 ** 5
 
                 property['default'] = size
-            elif re.search('^(https|/[^/])', default): #urls and paths
+            elif re.search('^(https|/[^/])', default): # urls and paths
                 property['default'] = default
             else:
                 # ignoring numbers (they are durations if they reached here), enums (::), or default initializations (e.g. tls_config())
