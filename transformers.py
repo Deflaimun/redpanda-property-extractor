@@ -219,4 +219,5 @@ class SimpleDefaultValuesTransformer:
                 if not re.search('([0-9]|::|\\()', default):
                     property['default'] = default
                 else:
-                    pass #handle other cases
+                    # unhandled cases
+                    property['default'] = default
