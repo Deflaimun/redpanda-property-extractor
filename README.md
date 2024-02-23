@@ -37,7 +37,7 @@ pip install -r requirements.txt
 git clone https://github.com/redpanda-data/redpanda.git <dir>
 ```
 
-Alternatively, you can run `make` to generate the file. It will be stored at `./gen/properties-output.json`
+Alternatively, you can run `make` to generate the file. It will be stored at `./gen/properties-output.json`.
 
 ## Usage
 
@@ -77,8 +77,8 @@ To create a new transformer, you need to create a class with the following metho
         - The default value
   - `file_pair`: object with two properties `header` and `implementation` containing the path (as string) of the files that the property being processed belongs to
 - `parse(self, property, info, file_pair) -> void` where:
-    - `info`, `file_pair` are the same as in the `accepts` method
-    - `property` is a dictionary where you can operate to modify the fields present in the JSON output
+    - `info` and `file_pair` are the same as in the `accepts` method
+    - `property` is a dictionary where you can operate to modify the fields in the JSON output
 
 To use your new transformer, add it to the list of [enabled transformers](property_extractor.py#L70). To see the existing transformers, check the [transformers.py](transformers.py) file.
 
