@@ -13,19 +13,21 @@ from parser import build_treesitter_cpp_library, extract_properties_from_file_pa
 from property_bag import PropertyBag
 from transformers import *
 
-logger = logging.getLogger('viewer')
+logger = logging.getLogger("viewer")
+
 
 def validate_paths(options):
     path = options.path
 
     if not os.path.exists(path):
-        logger.error(f"Path does not exist: \"{path}\".")
+        logger.error(f'Path does not exist: "{path}".')
         sys.exit(1)
 
     if options.definitions and not os.path.exists(options.definitions):
-        logger.error(f"File with the type definitions not found: \"{options.definitions}\".")
+        logger.error(
+            f'File with the type definitions not found: "{options.definitions}".'
+        )
         sys.exit(1)
-
 
 
 def get_file_pairs(options):
@@ -36,10 +38,11 @@ def get_file_pairs(options):
     file_pairs = []
 
     for i in file_iter:
-        if os.path.exists(i.with_suffix('.cc')):
+        if os.path.exists(i.with_suffix(".cc")):
             file_pairs.append(FilePair(i.resolve(), i.with_suffix(".cc").resolve()))
 
     return file_pairs
+
 
 def get_treesitter_cpp_parser_and_language(treesitter_dir, destination_path):
     if not os.path.exists(destination_path):
@@ -52,11 +55,14 @@ def get_treesitter_cpp_parser_and_language(treesitter_dir, destination_path):
 
     return parser, cpp
 
+
 def get_files_with_properties(file_pairs, treesitter_parser, cpp_language):
     files_with_properties = []
 
     for fp in file_pairs:
-        properties = extract_properties_from_file_pair(treesitter_parser, cpp_language, fp)
+        properties = extract_properties_from_file_pair(
+            treesitter_parser, cpp_language, fp
+        )
 
         if len(properties) > 0:
             files_with_properties.append((fp, properties))
@@ -78,7 +84,7 @@ def transform_files_with_properties(files_with_properties):
         IsSecretTransformer(),
         NumericBoundsTransformer(type_transformer),
         DurationBoundsTransformer(type_transformer),
-        SimpleDefaultValuesTransformer()
+        SimpleDefaultValuesTransformer(),
     ]
 
     all_properties = PropertyBag()
@@ -86,7 +92,7 @@ def transform_files_with_properties(files_with_properties):
     for fp, properties in files_with_properties:
         for name in properties:
             # ignore private properties
-            if re.match(r'^_', name):
+            if re.match(r"^_", name):
                 continue
 
             property_definition = PropertyBag()
@@ -100,61 +106,60 @@ def transform_files_with_properties(files_with_properties):
 
     return all_properties
 
+
 def merge_properties_and_definitions(properties, definitions):
     for name in properties:
         property = properties[name]
 
+        if property["type"] in definitions:
+            properties[name]["type"] = "#/definitions/" + property["type"]
+        elif property["type"] == "array" and property["items"]["type"] in definitions:
+            properties[name]["items"]["type"] = (
+                "#/definitions/" + property["items"]["type"]
+            )
 
-        if property['type'] in definitions:
-            properties[name]['type'] = '#/definitions/' + property['type']
-        elif property['type'] == 'array' and property['items']['type'] in definitions:
-            properties[name]['items']['type'] = '#/definitions/' + property['items']['type']
-
-
-    return dict(properties=properties,definitions=definitions)
-
-
+    return dict(properties=properties, definitions=definitions)
 
 
 def main():
     import argparse
 
     def generate_options():
-        arg_parser = argparse.ArgumentParser(description="Extract all properties from the Redpanda's source code and generate a JSON output with their definitions")
+        arg_parser = argparse.ArgumentParser(
+            description="Extract all properties from the Redpanda's source code and generate a JSON output with their definitions"
+        )
         arg_parser.add_argument(
-            '--path',
+            "--path",
             type=str,
             required=True,
-            help="Path to the Redpanda's source dir to extract the properties"
+            help="Path to the Redpanda's source dir to extract the properties",
         )
 
         arg_parser.add_argument(
-            '--recursive',
-            action='store_true',
-            help="Scan the path recursively"
+            "--recursive", action="store_true", help="Scan the path recursively"
         )
 
         arg_parser.add_argument(
-            '--output',
+            "--output",
             type=str,
             required=False,
-            help="File to store the JSON output. If no file is provided, the JSON will be printed to the standard output"
+            help="File to store the JSON output. If no file is provided, the JSON will be printed to the standard output",
         )
 
         arg_parser.add_argument(
-            '--definitions',
+            "--definitions",
             type=str,
             required=False,
-            default=os.path.dirname(os.path.realpath(__file__)) + '/definitions.json',
-            help="JSON file with the type definitions. This file will be merged in the output under the \"definitions\" field"
+            default=os.path.dirname(os.path.realpath(__file__)) + "/definitions.json",
+            help='JSON file with the type definitions. This file will be merged in the output under the "definitions" field',
         )
 
-        arg_parser.add_argument('-v', "--verbose", action="store_true")
+        arg_parser.add_argument("-v", "--verbose", action="store_true")
 
         return arg_parser
 
     arg_parser = generate_options()
-    options, _ =arg_parser.parse_known_args()
+    options, _ = arg_parser.parse_known_args()
 
     if options.verbose:
         logging.basicConfig(level="DEBUG")
@@ -175,22 +180,25 @@ def main():
         with open(options.definitions) as json_file:
             definitions = json.load(json_file)
 
-
-    treesitter_parser, cpp_language = get_treesitter_cpp_parser_and_language("tree-sitter/tree-sitter-cpp", "tree-sitter/tree-sitter-cpp.so")
-    files_with_properties = get_files_with_properties(file_pairs, treesitter_parser, cpp_language)
+    treesitter_parser, cpp_language = get_treesitter_cpp_parser_and_language(
+        "tree-sitter/tree-sitter-cpp", "tree-sitter/tree-sitter-cpp.so"
+    )
+    files_with_properties = get_files_with_properties(
+        file_pairs, treesitter_parser, cpp_language
+    )
     properties = transform_files_with_properties(files_with_properties)
-    properties_and_definitions = merge_properties_and_definitions(properties, definitions)
+    properties_and_definitions = merge_properties_and_definitions(
+        properties, definitions
+    )
 
     json_output = json.dumps(properties_and_definitions, indent=4, sort_keys=True)
 
     if options.output:
-        with open(options.output, 'w+') as json_file:
+        with open(options.output, "w+") as json_file:
             json_file.write(json_output)
     else:
         print(json_output)
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
