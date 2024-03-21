@@ -1,15 +1,333 @@
-= Broker Configuration Properties 
-:description: Broker configuration properties list. 
+= Redpanda Configuration Properties 
+:description: Redpanda configuration properties. 
+
+== Broker
 
 Broker configuration properties are applied individually to each broker in a cluster. 
 
 IMPORTANT: After you change a broker-level property setting, you must restart the broker for the change to take effect. 
 
-To learn how to set these properties from studying a sample configuration file, see the xref:./node-configuration-sample.adoc[broker configuration sample].
-
 ---
 
-== abort_index_segment_size
+=== admin
+
+Address and port of admin server
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* #/definitions/model::broker_endpoint
+
+*Default:* '{model::broker_endpoint(net::unresolved_address("127.0.0.1", 9644))}'
+
+=== admin_api_doc_dir
+
+Admin API doc directory
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* string
+
+*Default:* '/usr/share/redpanda/admin-api-doc'
+
+=== admin_api_tls
+
+TLS configuration for admin HTTP server
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* #/definitions/endpoint_tls_config
+
+*Default:* None
+
+=== cloud_storage_cache_directory
+
+Directory for archival cache. Should be present when `cloud_storage_enabled` is present
+
+*Requires Restart:* Yes
+
+*Nullable:* Yes
+
+*Visibility:* user
+
+*Type:* string
+
+*Default:* None
+
+=== crash_loop_limit
+
+Maximum consecutive crashes (unclean shutdowns) allowed after which operator intervention is needed to startup the broker. Limit is not enforced in developer mode.
+
+*Requires Restart:* Yes
+
+*Nullable:* Yes
+
+*Visibility:* user
+
+*Type:* integer
+
+*Accepted values:* [0, 4294967295]
+
+*Default:* 5
+
+=== data_directory
+
+Place where redpanda will keep the data
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* string
+
+*Default:* None
+
+=== developer_mode
+
+Skips most of the checks performed at startup, not recomended for production use
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* tunable
+
+*Type:* boolean
+
+*Default:* False
+
+=== emergency_disable_data_transforms
+
+Override the cluster enablement setting and disable WebAssembly powered data transforms. Only used as an emergency shutoff button.
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* boolean
+
+*Default:* False
+
+=== empty_seed_starts_cluster
+
+If true, an empty seed_servers list will denote that this node should form a cluster. At most one node in the cluster should be configured configured with an empty seed_servers list. If no such configured node exists, or if configured to false, all nodes denoted by the seed_servers list must be identical among those nodes' configurations, and those nodes will form the initial cluster.
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* boolean
+
+*Default:* True
+
+=== kafka_api
+
+Address and port of an interface to listen for Kafka API requests
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* #/definitions/config::broker_authn_endpoint
+
+*Default:* {'address': 'net::unresolved_address("127.0.0.1", 9092)', 'authn_method': 'std::nullopt'}
+
+=== kafka_api_tls
+
+TLS configuration for Kafka API endpoint
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* #/definitions/endpoint_tls_config
+
+*Default:* None
+
+=== memory_allocation_warning_threshold
+
+Enables log messages for allocations greater than the given size.
+
+*Requires Restart:* Yes
+
+*Nullable:* Yes
+
+*Visibility:* tunable
+
+*Type:* integer
+
+*Default:* '128_KiB + 1'
+
+=== node_id
+
+Unique id identifying a node in the cluster. If missing, a unique id will be assigned for this node when it joins the cluster
+
+*Requires Restart:* Yes
+
+*Nullable:* Yes
+
+*Visibility:* user
+
+*Type:* #/definitions/model::node_id
+
+*Default:* None
+
+=== rack
+
+Rack identifier
+
+*Requires Restart:* Yes
+
+*Nullable:* Yes
+
+*Visibility:* user
+
+*Type:* #/definitions/model::rack_id
+
+*Default:* None
+
+=== recovery_mode_enabled
+
+If true, start redpanda in "metadata only" mode, skipping loading user partitions and allowing only metadata operations.
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* boolean
+
+*Default:* False
+
+=== rpc_server
+
+IpAddress and port for RPC server
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* #/definitions/net::unresolved_address
+
+*Default:* 'net::unresolved_address("127.0.0.1", 33145)'
+
+=== rpc_server_tls
+
+TLS configuration for RPC server
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* #/definitions/tls_config
+
+*Default:* 'tls_config()'
+
+=== seed_servers
+
+List of the seed servers used to join current cluster. If the seed_server list is empty the node will be a cluster root and it will form a new cluster
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* user
+
+*Type:* array
+
+*Default:* None
+
+=== storage_failure_injection_config_path
+
+Path to the configuration file used for low level storage failure injection
+
+*Requires Restart:* Yes
+
+*Nullable:* Yes
+
+*Visibility:* tunable
+
+*Type:* string
+
+*Default:* None
+
+=== storage_failure_injection_enabled
+
+If true, inject low level storage failures on the write path. **Not** for production usage.
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* tunable
+
+*Type:* boolean
+
+*Default:* False
+
+=== upgrade_override_checks
+
+Whether to violate safety checks when starting a redpanda version newer than the cluster's consensus version
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* tunable
+
+*Type:* boolean
+
+*Default:* False
+
+=== verbose_logging_timeout_sec_max
+
+Maximum duration in seconds for verbose (i.e. TRACE or DEBUG) logging. Values configured above this will be clamped. If null (the default) there is no limit. Can be overridded in the Admin API on a per-request basis.
+
+*Requires Restart:* Yes
+
+*Nullable:* Yes
+
+*Visibility:* tunable
+
+*Type:* integer
+
+*Accepted values:* [-17179869184, 17179869183]
+
+*Default:* None
+
+
+
+== Cluster Configuration
+
+Cluster Configuration intro
+
+=== abort_index_segment_size
 
 Capacity (in number of txns) of an abort index segment
 
@@ -25,9 +343,7 @@ Capacity (in number of txns) of an abort index segment
 
 *Default:* 50000
 
-*Example:* 
-
-== abort_timed_out_transactions_interval_ms
+=== abort_timed_out_transactions_interval_ms
 
 How often look for the inactive transactions and abort them
 
@@ -43,41 +359,7 @@ How often look for the inactive transactions and abort them
 
 *Default:* '10s'
 
-*Example:* 
-
-== admin
-
-Address and port of admin server
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* user
-
-*Type:* #/definitions/model::broker_endpoint
-
-*Default:* '{model::broker_endpoint(net::unresolved_address("127.0.0.1", 9644))}'
-
-*Example:* 
-
-== admin_api_doc_dir
-
-Admin API doc directory
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* user
-
-*Type:* string
-
-*Default:* '/usr/share/redpanda/admin-api-doc'
-
-*Example:* 
-
-== admin_api_require_auth
+=== admin_api_require_auth
 
 Whether admin API clients must provide HTTP Basic authentication headers
 
@@ -91,25 +373,21 @@ Whether admin API clients must provide HTTP Basic authentication headers
 
 *Default:* False
 
-*Example:* 
+=== aggregate_metrics
 
-== admin_api_tls
-
-TLS configuration for admin HTTP server
+Enable aggregations of metrics returned by the prometheus '/metrics' endpoint. Metric aggregation is performed by summing the values of samples by labels. Aggregations are performed where it makes sense by the shard and/or partition labels.
 
 *Requires Restart:* No
 
 *Nullable:* No
 
-*Visibility:* user
+*Visibility:* None
 
-*Type:* #/definitions/endpoint_tls_config
+*Type:* boolean
 
-*Default:* None
+*Default:* False
 
-*Example:* 
-
-== alter_topic_cfg_timeout_ms
+=== alter_topic_cfg_timeout_ms
 
 Time to wait for entries replication in controller log when executing alter configuration request
 
@@ -125,9 +403,7 @@ Time to wait for entries replication in controller log when executing alter conf
 
 *Default:* '5s'
 
-*Example:* 
-
-== append_chunk_size
+=== append_chunk_size
 
 Size of direct write operations to disk in bytes
 
@@ -141,9 +417,7 @@ Size of direct write operations to disk in bytes
 
 *Default:* 16384
 
-*Example:* 
-
-== audit_client_max_buffer_size
+=== audit_client_max_buffer_size
 
 Maximum number of bytes the internal audit client will allocate for audit log records. Disable and re-enable auditing for changes to take affect
 
@@ -157,9 +431,7 @@ Maximum number of bytes the internal audit client will allocate for audit log re
 
 *Default:* 16777216
 
-*Example:* 
-
-== audit_enabled
+=== audit_enabled
 
 Enable/Disable audit logging.
 
@@ -173,9 +445,7 @@ Enable/Disable audit logging.
 
 *Default:* False
 
-*Example:* 
-
-== audit_enabled_event_types
+=== audit_enabled_event_types
 
 List of event classes that will be audited, options are: [management, produce, consume, describe, heartbeat, authenticate, admin, schema_registry]. Please refer to the documentation to know exactly which request(s) map to a particular audit event type.
 
@@ -189,9 +459,7 @@ List of event classes that will be audited, options are: [management, produce, c
 
 *Default:* ['management', 'authenticate', 'admin']
 
-*Example:* 
-
-== audit_excluded_principals
+=== audit_excluded_principals
 
 List of user principals to exclude from auditing
 
@@ -205,9 +473,7 @@ List of user principals to exclude from auditing
 
 *Default:* None
 
-*Example:* 
-
-== audit_excluded_topics
+=== audit_excluded_topics
 
 List of topics to exclude from auditing
 
@@ -221,9 +487,7 @@ List of topics to exclude from auditing
 
 *Default:* None
 
-*Example:* 
-
-== audit_log_num_partitions
+=== audit_log_num_partitions
 
 Number of partitions for the internal audit log topic. Attempt to create topic is only performed if it doesn't already exist, disable and re-enable auditing for changes to take affect
 
@@ -239,9 +503,7 @@ Number of partitions for the internal audit log topic. Attempt to create topic i
 
 *Default:* 12
 
-*Example:* 
-
-== audit_log_replication_factor
+=== audit_log_replication_factor
 
 Replication factor of the internal audit log topic. Attempt to create topic is only performed if it doesn't already exist, disable and re-enable auditing for changes to take affect.  If unset, defaults to `default_topic_replication`
 
@@ -257,9 +519,7 @@ Replication factor of the internal audit log topic. Attempt to create topic is o
 
 *Default:* None
 
-*Example:* 
-
-== audit_queue_drain_interval_ms
+=== audit_queue_drain_interval_ms
 
 Frequency in which per shard audit logs are batched to client for write to audit log. Longer intervals allow for greater change for coalescing duplicates (great for high throughput auditing scenarios) but increase the risk of data loss during hard shutdowns.
 
@@ -275,9 +535,7 @@ Frequency in which per shard audit logs are batched to client for write to audit
 
 *Default:* '500ms'
 
-*Example:* 
-
-== audit_queue_max_buffer_size_per_shard
+=== audit_queue_max_buffer_size_per_shard
 
 Maximum amount of memory allowed in the audit buffer per shard Once this value is reached, any request handlers that cannot enqueue audit messages will return a non retryable error to the client. Note that this only will occur when handling requests that are currently enabled for auditing.
 
@@ -291,9 +549,7 @@ Maximum amount of memory allowed in the audit buffer per shard Once this value i
 
 *Default:* 1048576
 
-*Example:* 
-
-== auto_create_topics_enabled
+=== auto_create_topics_enabled
 
 Allow topic auto creation
 
@@ -307,9 +563,7 @@ Allow topic auto creation
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_access_key
+=== cloud_storage_access_key
 
 AWS access key
 
@@ -323,9 +577,7 @@ AWS access key
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_api_endpoint
+=== cloud_storage_api_endpoint
 
 Optional API endpoint
 
@@ -339,9 +591,7 @@ Optional API endpoint
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_api_endpoint_port
+=== cloud_storage_api_endpoint_port
 
 TLS port override
 
@@ -357,9 +607,7 @@ TLS port override
 
 *Default:* 443
 
-*Example:* 
-
-== cloud_storage_attempt_cluster_restore_on_bootstrap
+=== cloud_storage_attempt_cluster_restore_on_bootstrap
 
 If set to `true`, when a cluster is started for the first time and there is cluster metadata in the configured cloud storage bucket, Redpanda automatically starts a cluster restore from that metadata. If using an automated method for deployment where it's not easy to predictably determine that a restore is needed, we recommend setting to `true`. Take care to ensure that in such deployments, a cluster bootstrap with a given bucket means that any previous cluster using that bucket is fully destroyed; otherwise tiered storage subsystems may interfere with each other.
 
@@ -373,9 +621,7 @@ If set to `true`, when a cluster is started for the first time and there is clus
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_azure_adls_endpoint
+=== cloud_storage_azure_adls_endpoint
 
 Azure Data Lake Storage v2 endpoint override. Use when Hierarchical Namespaces are enabled on your storage account and you have set up a custom endpoint.
 
@@ -389,9 +635,7 @@ Azure Data Lake Storage v2 endpoint override. Use when Hierarchical Namespaces a
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_azure_adls_port
+=== cloud_storage_azure_adls_port
 
 Azure Data Lake Storage v2 port override. Also see cloud_storage_azure_adls_endpoint.
 
@@ -407,9 +651,7 @@ Azure Data Lake Storage v2 port override. Also see cloud_storage_azure_adls_endp
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_azure_container
+=== cloud_storage_azure_container
 
 The name of the Azure container to use with Tiered Storage. Note that the container must belong to 'cloud_storage_azure_storage_account'
 
@@ -423,9 +665,7 @@ The name of the Azure container to use with Tiered Storage. Note that the contai
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_azure_shared_key
+=== cloud_storage_azure_shared_key
 
 The shared key to be used for Azure Shared Key authentication with the configured Azure storage account (see 'cloud_storage_azure_storage_account)'. Note that Redpanda expects this string to be Base64 encoded.
 
@@ -439,9 +679,7 @@ The shared key to be used for Azure Shared Key authentication with the configure
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_azure_storage_account
+=== cloud_storage_azure_storage_account
 
 The name of the Azure storage account to use with Tiered Storage
 
@@ -455,9 +693,7 @@ The name of the Azure storage account to use with Tiered Storage
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_backend
+=== cloud_storage_backend
 
 Optional cloud storage backend variant used to select API capabilities. If not supplied, will be inferred from other configuration parameters.
 
@@ -471,9 +707,7 @@ Optional cloud storage backend variant used to select API capabilities. If not s
 
 *Default:* 'model::cloud_storage_backend::unknown'
 
-*Example:* 
-
-== cloud_storage_background_jobs_quota
+=== cloud_storage_background_jobs_quota
 
 The number of total requests that the cloud storage background jobs are allowed to make during one background housekeeping run. This is a per shard limit.
 
@@ -489,9 +723,7 @@ The number of total requests that the cloud storage background jobs are allowed 
 
 *Default:* 5000
 
-*Example:* 
-
-== cloud_storage_bucket
+=== cloud_storage_bucket
 
 AWS bucket that should be used to store data
 
@@ -505,9 +737,7 @@ AWS bucket that should be used to store data
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_cache_check_interval_ms
+=== cloud_storage_cache_check_interval_ms
 
 Minimum time between trims of tiered storage cache.  If a fetch operation requires trimming the cache, and the most recent trim was within this period, then trimming will be delayed until this period has elapsed
 
@@ -523,9 +753,7 @@ Minimum time between trims of tiered storage cache.  If a fetch operation requir
 
 *Default:* '5s'
 
-*Example:* 
-
-== cloud_storage_cache_chunk_size
+=== cloud_storage_cache_chunk_size
 
 Size of chunks of segments downloaded into cloud storage cache. Reduces space usage by only downloading the necessary chunk from a segment.
 
@@ -541,25 +769,7 @@ Size of chunks of segments downloaded into cloud storage cache. Reduces space us
 
 *Default:* 16777216
 
-*Example:* 
-
-== cloud_storage_cache_directory
-
-Directory for archival cache. Should be present when `cloud_storage_enabled` is present
-
-*Requires Restart:* No
-
-*Nullable:* Yes
-
-*Visibility:* user
-
-*Type:* string
-
-*Default:* None
-
-*Example:* 
-
-== cloud_storage_cache_max_objects
+=== cloud_storage_cache_max_objects
 
 Maximum number of objects that may be held in the tiered storage cache.  This applies simultaneously with `cloud_storage_cache_size`, and which ever limit is hit first will drive trimming of the cache.
 
@@ -575,9 +785,7 @@ Maximum number of objects that may be held in the tiered storage cache.  This ap
 
 *Default:* 100000
 
-*Example:* 
-
-== cloud_storage_cache_size
+=== cloud_storage_cache_size
 
 Max size of archival cache
 
@@ -593,9 +801,7 @@ Max size of archival cache
 
 *Default:* 0
 
-*Example:* 
-
-== cloud_storage_cache_size_percent
+=== cloud_storage_cache_size_percent
 
 The maximum size of the archival cache as a percentage of unreserved disk space (see disk_reservation_percent). The default value for this option is tuned for a shared disk configuration. When using a dedicated cache disk consider increasing the value.
 
@@ -609,9 +815,7 @@ The maximum size of the archival cache as a percentage of unreserved disk space 
 
 *Default:* 20.0
 
-*Example:* 
-
-== cloud_storage_chunk_eviction_strategy
+=== cloud_storage_chunk_eviction_strategy
 
 Selects a strategy for evicting unused cache chunks.
 
@@ -625,9 +829,7 @@ Selects a strategy for evicting unused cache chunks.
 
 *Default:* 'model::cloud_storage_chunk_eviction_strategy::eager'
 
-*Example:* 
-
-== cloud_storage_chunk_prefetch
+=== cloud_storage_chunk_prefetch
 
 Number of chunks to prefetch ahead of every downloaded chunk
 
@@ -643,9 +845,7 @@ Number of chunks to prefetch ahead of every downloaded chunk
 
 *Default:* 0
 
-*Example:* 
-
-== cloud_storage_cluster_metadata_num_consumer_groups_per_upload
+=== cloud_storage_cluster_metadata_num_consumer_groups_per_upload
 
 Number of groups to upload in a single snapshot object during consumer offsets upload. Setting a lower value will mean a larger number of smaller snapshots are uploaded.
 
@@ -659,9 +859,7 @@ Number of groups to upload in a single snapshot object during consumer offsets u
 
 *Default:* 1000
 
-*Example:* 
-
-== cloud_storage_cluster_metadata_retries
+=== cloud_storage_cluster_metadata_retries
 
 Number of attempts metadata operations may be retried.
 
@@ -677,9 +875,7 @@ Number of attempts metadata operations may be retried.
 
 *Default:* 5
 
-*Example:* 
-
-== cloud_storage_cluster_metadata_upload_interval_ms
+=== cloud_storage_cluster_metadata_upload_interval_ms
 
 Time interval to wait between cluster metadata uploads.
 
@@ -695,9 +891,7 @@ Time interval to wait between cluster metadata uploads.
 
 *Default:* '1h'
 
-*Example:* 
-
-== cloud_storage_cluster_metadata_upload_timeout_ms
+=== cloud_storage_cluster_metadata_upload_timeout_ms
 
 Timeout for cluster metadata uploads.
 
@@ -713,9 +907,7 @@ Timeout for cluster metadata uploads.
 
 *Default:* '60s'
 
-*Example:* 
-
-== cloud_storage_credentials_host
+=== cloud_storage_credentials_host
 
 The hostname to connect to for retrieving role based credentials. Derived from cloud_storage_credentials_source if not set. Only required when using IAM role based access.
 
@@ -729,9 +921,7 @@ The hostname to connect to for retrieving role based credentials. Derived from c
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_credentials_source
+=== cloud_storage_credentials_source
 
 The source of credentials to connect to cloud services
 
@@ -745,9 +935,7 @@ The source of credentials to connect to cloud services
 
 *Default:* 'model::cloud_credentials_source::config_file'
 
-*Example:* 
-
-== cloud_storage_disable_chunk_reads
+=== cloud_storage_disable_chunk_reads
 
 Disable chunk reads and switch back to legacy mode where full segments are downloaded.
 
@@ -761,9 +949,7 @@ Disable chunk reads and switch back to legacy mode where full segments are downl
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_disable_metadata_consistency_checks
+=== cloud_storage_disable_metadata_consistency_checks
 
 Disable all metadata consistency checks. This will allow redpanda to replay logs with inconsistent tiered-storage metadata. Normally, this option should be disabled.
 
@@ -777,9 +963,7 @@ Disable all metadata consistency checks. This will allow redpanda to replay logs
 
 *Default:* True
 
-*Example:* 
-
-== cloud_storage_disable_read_replica_loop_for_tests
+=== cloud_storage_disable_read_replica_loop_for_tests
 
 Begins the read replica sync loop in tiered-storage-enabled topic partitions. The property exists to simplify testing and shouldn't be set in production.
 
@@ -793,9 +977,7 @@ Begins the read replica sync loop in tiered-storage-enabled topic partitions. Th
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_disable_tls
+=== cloud_storage_disable_tls
 
 Disable TLS for all S3 connections
 
@@ -809,9 +991,7 @@ Disable TLS for all S3 connections
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_disable_upload_consistency_checks
+=== cloud_storage_disable_upload_consistency_checks
 
 Disable all upload consistency checks. This will allow redpanda to upload logs with gaps and replicate metadata with consistency violations. Normally, this options should be disabled.
 
@@ -825,9 +1005,7 @@ Disable all upload consistency checks. This will allow redpanda to upload logs w
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_disable_upload_loop_for_tests
+=== cloud_storage_disable_upload_loop_for_tests
 
 Begins the upload loop in tiered-storage-enabled topic partitions. The property exists to simplify testing and shouldn't be set in production.
 
@@ -841,9 +1019,7 @@ Begins the upload loop in tiered-storage-enabled topic partitions. The property 
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_enable_compacted_topic_reupload
+=== cloud_storage_enable_compacted_topic_reupload
 
 Enable re-uploading data for compacted topics
 
@@ -857,9 +1033,7 @@ Enable re-uploading data for compacted topics
 
 *Default:* True
 
-*Example:* 
-
-== cloud_storage_enable_remote_read
+=== cloud_storage_enable_remote_read
 
 Default remote read config value for new topics
 
@@ -873,9 +1047,7 @@ Default remote read config value for new topics
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_enable_remote_write
+=== cloud_storage_enable_remote_write
 
 Default remote write value for new topics
 
@@ -889,9 +1061,7 @@ Default remote write value for new topics
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_enable_scrubbing
+=== cloud_storage_enable_scrubbing
 
 Enable scrubbing of cloud storage partitions. The scrubber validates the integrity of data and metadata uploaded to cloud storage
 
@@ -905,9 +1075,7 @@ Enable scrubbing of cloud storage partitions. The scrubber validates the integri
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_enable_segment_merging
+=== cloud_storage_enable_segment_merging
 
 Enables adjacent segment merging. The segments are reuploaded if there is an opportunity for that and if it will improve the tiered-storage performance
 
@@ -921,9 +1089,7 @@ Enables adjacent segment merging. The segments are reuploaded if there is an opp
 
 *Default:* True
 
-*Example:* 
-
-== cloud_storage_enabled
+=== cloud_storage_enabled
 
 Enable archival storage
 
@@ -937,9 +1103,7 @@ Enable archival storage
 
 *Default:* False
 
-*Example:* 
-
-== cloud_storage_full_scrub_interval_ms
+=== cloud_storage_full_scrub_interval_ms
 
 Time interval between a final scrub and thte next scrub
 
@@ -955,9 +1119,7 @@ Time interval between a final scrub and thte next scrub
 
 *Default:* '12h'
 
-*Example:* 
-
-== cloud_storage_garbage_collect_timeout_ms
+=== cloud_storage_garbage_collect_timeout_ms
 
 Timeout for running the cloud storage garbage collection (ms)
 
@@ -973,9 +1135,7 @@ Timeout for running the cloud storage garbage collection (ms)
 
 *Default:* '30s'
 
-*Example:* 
-
-== cloud_storage_graceful_transfer_timeout_ms
+=== cloud_storage_graceful_transfer_timeout_ms
 
 Time limit on waiting for uploads to complete before a leadership transfer.  If this is null, leadership transfers will proceed without waiting.
 
@@ -991,9 +1151,7 @@ Time limit on waiting for uploads to complete before a leadership transfer.  If 
 
 *Default:* '5s'
 
-*Example:* 
-
-== cloud_storage_housekeeping_interval_ms
+=== cloud_storage_housekeeping_interval_ms
 
 Interval for cloud storage housekeeping tasks
 
@@ -1009,9 +1167,7 @@ Interval for cloud storage housekeeping tasks
 
 *Default:* '5min'
 
-*Example:* 
-
-== cloud_storage_hydrated_chunks_per_segment_ratio
+=== cloud_storage_hydrated_chunks_per_segment_ratio
 
 The maximum number of chunks per segment that can be hydrated at a time. Above this number, unused chunks will be trimmed.
 
@@ -1025,9 +1181,7 @@ The maximum number of chunks per segment that can be hydrated at a time. Above t
 
 *Default:* 0.7
 
-*Example:* 
-
-== cloud_storage_hydration_timeout_ms
+=== cloud_storage_hydration_timeout_ms
 
 Duration to wait for a hydration request to be fulfilled, if hydration is not completed within this time, the consumer will be notified with a timeout error.
 
@@ -1043,9 +1197,7 @@ Duration to wait for a hydration request to be fulfilled, if hydration is not co
 
 *Default:* '600s'
 
-*Example:* 
-
-== cloud_storage_idle_threshold_rps
+=== cloud_storage_idle_threshold_rps
 
 The cloud storage request rate threshold for idle state detection. If the average request rate for the configured period is lower than this threshold the cloud storage is considered being idle.
 
@@ -1059,9 +1211,7 @@ The cloud storage request rate threshold for idle state detection. If the averag
 
 *Default:* 10.0
 
-*Example:* 
-
-== cloud_storage_idle_timeout_ms
+=== cloud_storage_idle_timeout_ms
 
 Timeout used to detect idle state of the cloud storage API. If the average cloud storage request rate is below this threshold for a configured amount of time the cloud storage is considered idle and the housekeeping jobs are started.
 
@@ -1077,9 +1227,7 @@ Timeout used to detect idle state of the cloud storage API. If the average cloud
 
 *Default:* '10s'
 
-*Example:* 
-
-== cloud_storage_initial_backoff_ms
+=== cloud_storage_initial_backoff_ms
 
 Initial backoff time for exponential backoff algorithm (ms)
 
@@ -1095,9 +1243,7 @@ Initial backoff time for exponential backoff algorithm (ms)
 
 *Default:* '100ms'
 
-*Example:* 
-
-== cloud_storage_manifest_cache_size
+=== cloud_storage_manifest_cache_size
 
 Amount of memory that can be used to handle tiered-storage metadata
 
@@ -1111,9 +1257,7 @@ Amount of memory that can be used to handle tiered-storage metadata
 
 *Default:* 1048576
 
-*Example:* 
-
-== cloud_storage_manifest_cache_ttl_ms
+=== cloud_storage_manifest_cache_ttl_ms
 
 The time interval that determines how long the materialized manifest can stay in cache under contention. This parameter is used for performance tuning. When the spillover manifest is materialized and stored in cache and the cache needs to evict it it will use 'cloud_storage_materialized_manifest_ttl_ms' value as a timeout. The cursor that uses the spillover manifest uses this value as a TTL interval after which it stops referencing the manifest making it available for eviction. This only affects spillover manifests under contention.
 
@@ -1129,9 +1273,7 @@ The time interval that determines how long the materialized manifest can stay in
 
 *Default:* '10s'
 
-*Example:* 
-
-== cloud_storage_manifest_max_upload_interval_sec
+=== cloud_storage_manifest_max_upload_interval_sec
 
 Wait at least this long between partition manifest uploads. Actual time between uploads may be greater than this interval. If this is null, metadata will be updated after each segment upload.
 
@@ -1147,9 +1289,7 @@ Wait at least this long between partition manifest uploads. Actual time between 
 
 *Default:* '60s'
 
-*Example:* 
-
-== cloud_storage_manifest_upload_timeout_ms
+=== cloud_storage_manifest_upload_timeout_ms
 
 Manifest upload timeout (ms)
 
@@ -1165,9 +1305,7 @@ Manifest upload timeout (ms)
 
 *Default:* '10s'
 
-*Example:* 
-
-== cloud_storage_max_concurrent_hydrations_per_shard
+=== cloud_storage_max_concurrent_hydrations_per_shard
 
 Maximum concurrent segment hydrations of remote data per CPU core.  If unset, value of `cloud_storage_max_connections / 2` is used, which means that half of available S3 bandwidth could be used to download data from S3. If the cloud storage cache is empty every new segment reader will require a download. This will lead to 1:1 mapping between number of partitions scanned by the fetch request and number of parallel downloads. If this value is too large the downloads can affect other workloads. In case of any problem caused by the tiered-storage reads this value can be lowered. This will only affect segment hydrations (downloads) but won't affect cached segments. If fetch request is reading from the tiered-storage cache its concurrency will only be limited by available memory.
 
@@ -1183,9 +1321,7 @@ Maximum concurrent segment hydrations of remote data per CPU core.  If unset, va
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_max_connection_idle_time_ms
+=== cloud_storage_max_connection_idle_time_ms
 
 Max https connection idle time (ms)
 
@@ -1201,9 +1337,7 @@ Max https connection idle time (ms)
 
 *Default:* '5s'
 
-*Example:* 
-
-== cloud_storage_max_connections
+=== cloud_storage_max_connections
 
 Max number of simultaneous connections to S3 per shard (includes connections used for both uploads and downloads)
 
@@ -1219,9 +1353,7 @@ Max number of simultaneous connections to S3 per shard (includes connections use
 
 *Default:* 20
 
-*Example:* 
-
-== cloud_storage_max_segment_readers_per_shard
+=== cloud_storage_max_segment_readers_per_shard
 
 Maximum concurrent I/O cursors of materialized remote segments per CPU core.  If unset, value of `topic_partitions_per_shard` is used, i.e. one segment reader per partition if the shard is at its maximum partition capacity.  These readers are cachedacross Kafka consume requests and store a readahead buffer.
 
@@ -1237,9 +1369,7 @@ Maximum concurrent I/O cursors of materialized remote segments per CPU core.  If
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_max_segments_pending_deletion_per_partition
+=== cloud_storage_max_segments_pending_deletion_per_partition
 
 The per-partition limit for the number of segments pending deletion from the cloud. Segments can be deleted due to retention or compaction. If this limit is breached and deletion fails, then segments will be orphaned in the cloud and will have to be removed manually
 
@@ -1253,9 +1383,7 @@ The per-partition limit for the number of segments pending deletion from the clo
 
 *Default:* 5000
 
-*Example:* 
-
-== cloud_storage_max_throughput_per_shard
+=== cloud_storage_max_throughput_per_shard
 
 Max throughput used by tiered-storage per shard in bytes per second. This value is an upper bound of the throughput available to the tiered-storage subsystem. This parameter is intended to be used as a safeguard and in tests when we need to set precise throughput value independent of actual storage media. Please use 'cloud_storage_throughput_limit_percent' instead of this parameter in the production environment.
 
@@ -1269,9 +1397,7 @@ Max throughput used by tiered-storage per shard in bytes per second. This value 
 
 *Default:* 1073741824
 
-*Example:* 
-
-== cloud_storage_metadata_sync_timeout_ms
+=== cloud_storage_metadata_sync_timeout_ms
 
 Timeout for SI metadata synchronization
 
@@ -1287,9 +1413,7 @@ Timeout for SI metadata synchronization
 
 *Default:* '10s'
 
-*Example:* 
-
-== cloud_storage_min_chunks_per_segment_threshold
+=== cloud_storage_min_chunks_per_segment_threshold
 
 The minimum number of chunks per segment for trimming to be enabled. If the number of chunks in a segment is below this threshold, the segment is small enough that all chunks in it can be hydrated at any given time
 
@@ -1305,9 +1429,7 @@ The minimum number of chunks per segment for trimming to be enabled. If the numb
 
 *Default:* 5
 
-*Example:* 
-
-== cloud_storage_partial_scrub_interval_ms
+=== cloud_storage_partial_scrub_interval_ms
 
 Time interval between two partial scrubs of the same partition
 
@@ -1323,9 +1445,7 @@ Time interval between two partial scrubs of the same partition
 
 *Default:* '1h'
 
-*Example:* 
-
-== cloud_storage_readreplica_manifest_sync_timeout_ms
+=== cloud_storage_readreplica_manifest_sync_timeout_ms
 
 Timeout to check if new data is available for partition in S3 for read replica
 
@@ -1341,9 +1461,7 @@ Timeout to check if new data is available for partition in S3 for read replica
 
 *Default:* '30s'
 
-*Example:* 
-
-== cloud_storage_recovery_temporary_retention_bytes_default
+=== cloud_storage_recovery_temporary_retention_bytes_default
 
 Retention in bytes for topics created during automated recovery
 
@@ -1357,9 +1475,7 @@ Retention in bytes for topics created during automated recovery
 
 *Default:* 1073741824
 
-*Example:* 
-
-== cloud_storage_region
+=== cloud_storage_region
 
 AWS region that houses the bucket used for storage
 
@@ -1373,9 +1489,7 @@ AWS region that houses the bucket used for storage
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_roles_operation_timeout_ms
+=== cloud_storage_roles_operation_timeout_ms
 
 Timeout for IAM role related operations (ms)
 
@@ -1391,9 +1505,7 @@ Timeout for IAM role related operations (ms)
 
 *Default:* '30s'
 
-*Example:* 
-
-== cloud_storage_scrubbing_interval_jitter_ms
+=== cloud_storage_scrubbing_interval_jitter_ms
 
 Jitter applied to the cloud storage scrubbing interval.
 
@@ -1409,9 +1521,7 @@ Jitter applied to the cloud storage scrubbing interval.
 
 *Default:* '10min'
 
-*Example:* 
-
-== cloud_storage_secret_key
+=== cloud_storage_secret_key
 
 AWS secret key
 
@@ -1425,9 +1535,7 @@ AWS secret key
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_segment_max_upload_interval_sec
+=== cloud_storage_segment_max_upload_interval_sec
 
 Time that segment can be kept locally without uploading it to the remote storage (sec)
 
@@ -1443,9 +1551,7 @@ Time that segment can be kept locally without uploading it to the remote storage
 
 *Default:* '1h'
 
-*Example:* 
-
-== cloud_storage_segment_size_min
+=== cloud_storage_segment_size_min
 
 Smallest acceptable segment size in the cloud storage. Default: cloud_storage_segment_size_target/2
 
@@ -1459,9 +1565,7 @@ Smallest acceptable segment size in the cloud storage. Default: cloud_storage_se
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_segment_size_target
+=== cloud_storage_segment_size_target
 
 Desired segment size in the cloud storage. Default: segment.bytes
 
@@ -1475,9 +1579,7 @@ Desired segment size in the cloud storage. Default: segment.bytes
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_segment_upload_timeout_ms
+=== cloud_storage_segment_upload_timeout_ms
 
 Log segment upload timeout (ms)
 
@@ -1493,9 +1595,7 @@ Log segment upload timeout (ms)
 
 *Default:* '30s'
 
-*Example:* 
-
-== cloud_storage_spillover_manifest_max_segments
+=== cloud_storage_spillover_manifest_max_segments
 
 Maximum number of elements in the spillover manifest that can be offloaded to the cloud storage. This property is similar to 'cloud_storage_spillover_manifest_size' but it triggers spillover based on number of segments instead of the size of the manifest in bytes. The property exists to simplify testing and shouldn't be set in the production environment
 
@@ -1509,9 +1609,7 @@ Maximum number of elements in the spillover manifest that can be offloaded to th
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_spillover_manifest_size
+=== cloud_storage_spillover_manifest_size
 
 The size of the manifest which can be offloaded to the cloud. If the size of the local manifest stored in redpanda exceeds cloud_storage_spillover_manifest_size x2 the spillover mechanism will split the manifest into two parts and one of them will be uploaded to S3.
 
@@ -1525,9 +1623,7 @@ The size of the manifest which can be offloaded to the cloud. If the size of the
 
 *Default:* 65536
 
-*Example:* 
-
-== cloud_storage_throughput_limit_percent
+=== cloud_storage_throughput_limit_percent
 
 Max throughput used by tiered-storage per node expressed as a percentage of the disk bandwidth. If the server has several disks Redpanda will take into account only the one which is used to store tiered-storage cache. Note that even if the tiered-storage is allowed to use full bandwidth of the disk (100%) it won't necessary use it in full. The actual usage depend on your workload and the state of the tiered-storage cache. This parameter is a safeguard that prevents tiered-storage from using too many system resources and not a performance tuning knob.
 
@@ -1541,9 +1637,7 @@ Max throughput used by tiered-storage per node expressed as a percentage of the 
 
 *Default:* 50
 
-*Example:* 
-
-== cloud_storage_topic_purge_grace_period_ms
+=== cloud_storage_topic_purge_grace_period_ms
 
 Grace period during which the purger will refuse to purge the topic.
 
@@ -1559,9 +1653,7 @@ Grace period during which the purger will refuse to purge the topic.
 
 *Default:* '30s'
 
-*Example:* 
-
-== cloud_storage_trust_file
+=== cloud_storage_trust_file
 
 Path to certificate that should be used to validate server certificate during TLS handshake
 
@@ -1575,9 +1667,7 @@ Path to certificate that should be used to validate server certificate during TL
 
 *Default:* None
 
-*Example:* 
-
-== cloud_storage_upload_ctrl_d_coeff
+=== cloud_storage_upload_ctrl_d_coeff
 
 derivative coefficient for upload PID controller.
 
@@ -1591,9 +1681,7 @@ derivative coefficient for upload PID controller.
 
 *Default:* 0.0
 
-*Example:* 
-
-== cloud_storage_upload_ctrl_max_shares
+=== cloud_storage_upload_ctrl_max_shares
 
 maximum number of IO and CPU shares that archival upload can use
 
@@ -1609,9 +1697,7 @@ maximum number of IO and CPU shares that archival upload can use
 
 *Default:* 1000
 
-*Example:* 
-
-== cloud_storage_upload_ctrl_min_shares
+=== cloud_storage_upload_ctrl_min_shares
 
 minimum number of IO and CPU shares that archival upload can use
 
@@ -1627,9 +1713,7 @@ minimum number of IO and CPU shares that archival upload can use
 
 *Default:* 100
 
-*Example:* 
-
-== cloud_storage_upload_ctrl_p_coeff
+=== cloud_storage_upload_ctrl_p_coeff
 
 proportional coefficient for upload PID controller
 
@@ -1643,9 +1727,7 @@ proportional coefficient for upload PID controller
 
 *Default:* -2.0
 
-*Example:* 
-
-== cloud_storage_upload_ctrl_update_interval_ms
+=== cloud_storage_upload_ctrl_update_interval_ms
 
 
 
@@ -1661,9 +1743,7 @@ proportional coefficient for upload PID controller
 
 *Default:* '60s'
 
-*Example:* 
-
-== cloud_storage_upload_loop_initial_backoff_ms
+=== cloud_storage_upload_loop_initial_backoff_ms
 
 Initial backoff interval when there is nothing to upload for a partition (ms)
 
@@ -1679,9 +1759,7 @@ Initial backoff interval when there is nothing to upload for a partition (ms)
 
 *Default:* '100ms'
 
-*Example:* 
-
-== cloud_storage_upload_loop_max_backoff_ms
+=== cloud_storage_upload_loop_max_backoff_ms
 
 Max backoff interval when there is nothing to upload for a partition (ms)
 
@@ -1697,9 +1775,21 @@ Max backoff interval when there is nothing to upload for a partition (ms)
 
 *Default:* '10s'
 
-*Example:* 
+=== cluster_id
 
-== compacted_log_segment_size
+Cluster identifier
+
+*Requires Restart:* No
+
+*Nullable:* Yes
+
+*Visibility:* None
+
+*Type:* string
+
+*Default:* None
+
+=== compacted_log_segment_size
 
 How large in bytes should each compacted log segment be (default 256MiB)
 
@@ -1715,9 +1805,7 @@ How large in bytes should each compacted log segment be (default 256MiB)
 
 *Default:* 268435456
 
-*Example:* 
-
-== compaction_ctrl_backlog_size
+=== compaction_ctrl_backlog_size
 
 target backlog size for compaction controller. if not set compaction target compaction backlog would be equal to 
 
@@ -1731,9 +1819,7 @@ target backlog size for compaction controller. if not set compaction target comp
 
 *Default:* None
 
-*Example:* 
-
-== compaction_ctrl_d_coeff
+=== compaction_ctrl_d_coeff
 
 derivative coefficient for compaction PID controller.
 
@@ -1747,9 +1833,7 @@ derivative coefficient for compaction PID controller.
 
 *Default:* 0.2
 
-*Example:* 
-
-== compaction_ctrl_i_coeff
+=== compaction_ctrl_i_coeff
 
 integral coefficient for compaction PID controller.
 
@@ -1763,9 +1847,7 @@ integral coefficient for compaction PID controller.
 
 *Default:* 0.0
 
-*Example:* 
-
-== compaction_ctrl_max_shares
+=== compaction_ctrl_max_shares
 
 maximum number of IO and CPU shares that compaction process can use
 
@@ -1781,9 +1863,7 @@ maximum number of IO and CPU shares that compaction process can use
 
 *Default:* 1000
 
-*Example:* 
-
-== compaction_ctrl_min_shares
+=== compaction_ctrl_min_shares
 
 minimum number of IO and CPU shares that compaction process can use
 
@@ -1799,9 +1879,7 @@ minimum number of IO and CPU shares that compaction process can use
 
 *Default:* 10
 
-*Example:* 
-
-== compaction_ctrl_p_coeff
+=== compaction_ctrl_p_coeff
 
 proportional coefficient for compaction PID controller. This has to be negative since compaction backlog should decrease when number of compaction shares increases
 
@@ -1815,9 +1893,7 @@ proportional coefficient for compaction PID controller. This has to be negative 
 
 *Default:* -12.5
 
-*Example:* 
-
-== compaction_ctrl_update_interval_ms
+=== compaction_ctrl_update_interval_ms
 
 
 
@@ -1833,9 +1909,7 @@ proportional coefficient for compaction PID controller. This has to be negative 
 
 *Default:* '30s'
 
-*Example:* 
-
-== controller_backend_housekeeping_interval_ms
+=== controller_backend_housekeeping_interval_ms
 
 Interval between iterations of controller backend housekeeping loop
 
@@ -1851,9 +1925,7 @@ Interval between iterations of controller backend housekeeping loop
 
 *Default:* '1s'
 
-*Example:* 
-
-== controller_log_accummulation_rps_capacity_acls_and_users_operations
+=== controller_log_accummulation_rps_capacity_acls_and_users_operations
 
 Maximum capacity of rate limit accumulationin controller acls and users operations limit
 
@@ -1867,9 +1939,7 @@ Maximum capacity of rate limit accumulationin controller acls and users operatio
 
 *Default:* None
 
-*Example:* 
-
-== controller_log_accummulation_rps_capacity_configuration_operations
+=== controller_log_accummulation_rps_capacity_configuration_operations
 
 Maximum capacity of rate limit accumulationin controller configuration operations limit
 
@@ -1883,9 +1953,7 @@ Maximum capacity of rate limit accumulationin controller configuration operation
 
 *Default:* None
 
-*Example:* 
-
-== controller_log_accummulation_rps_capacity_move_operations
+=== controller_log_accummulation_rps_capacity_move_operations
 
 Maximum capacity of rate limit accumulationin controller move operations limit
 
@@ -1899,9 +1967,7 @@ Maximum capacity of rate limit accumulationin controller move operations limit
 
 *Default:* None
 
-*Example:* 
-
-== controller_log_accummulation_rps_capacity_node_management_operations
+=== controller_log_accummulation_rps_capacity_node_management_operations
 
 Maximum capacity of rate limit accumulationin controller node management operations limit
 
@@ -1915,9 +1981,7 @@ Maximum capacity of rate limit accumulationin controller node management operati
 
 *Default:* None
 
-*Example:* 
-
-== controller_log_accummulation_rps_capacity_topic_operations
+=== controller_log_accummulation_rps_capacity_topic_operations
 
 Maximum capacity of rate limit accumulationin controller topic operations limit
 
@@ -1931,9 +1995,7 @@ Maximum capacity of rate limit accumulationin controller topic operations limit
 
 *Default:* None
 
-*Example:* 
-
-== controller_snapshot_max_age_sec
+=== controller_snapshot_max_age_sec
 
 Max time that will pass before we make an attempt to create a controller snapshot, after a new controller command appears
 
@@ -1949,9 +2011,7 @@ Max time that will pass before we make an attempt to create a controller snapsho
 
 *Default:* '60s'
 
-*Example:* 
-
-== cpu_profiler_enabled
+=== cpu_profiler_enabled
 
 Enables cpu profiling for Redpanda
 
@@ -1965,9 +2025,7 @@ Enables cpu profiling for Redpanda
 
 *Default:* False
 
-*Example:* 
-
-== cpu_profiler_sample_period_ms
+=== cpu_profiler_sample_period_ms
 
 The sample period for the CPU profiler
 
@@ -1983,27 +2041,7 @@ The sample period for the CPU profiler
 
 *Default:* '100ms'
 
-*Example:* 
-
-== crash_loop_limit
-
-Maximum consecutive crashes (unclean shutdowns) allowed after which operator intervention is needed to startup the broker. Limit is not enforced in developer mode.
-
-*Requires Restart:* No
-
-*Nullable:* Yes
-
-*Visibility:* user
-
-*Type:* integer
-
-*Accepted values:* [0, 4294967295]
-
-*Default:* 5
-
-*Example:* 
-
-== create_topic_timeout_ms
+=== create_topic_timeout_ms
 
 Timeout (ms) to wait for new topic creation
 
@@ -2019,25 +2057,7 @@ Timeout (ms) to wait for new topic creation
 
 *Default:* "2'000ms"
 
-*Example:* 
-
-== data_directory
-
-Place where redpanda will keep the data
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* user
-
-*Type:* string
-
-*Default:* None
-
-*Example:* 
-
-== data_transforms_binary_max_size
+=== data_transforms_binary_max_size
 
 The maximum size for a deployable WebAssembly binary that the broker can store.
 
@@ -2051,9 +2071,7 @@ The maximum size for a deployable WebAssembly binary that the broker can store.
 
 *Default:* 10485760
 
-*Example:* 
-
-== data_transforms_commit_interval_ms
+=== data_transforms_commit_interval_ms
 
 The interval at which Data Transforms commits progress.
 
@@ -2069,9 +2087,7 @@ The interval at which Data Transforms commits progress.
 
 *Default:* '3s'
 
-*Example:* 
-
-== data_transforms_enabled
+=== data_transforms_enabled
 
 Enables WebAssembly powered Data Transforms directly in the broker
 
@@ -2085,9 +2101,7 @@ Enables WebAssembly powered Data Transforms directly in the broker
 
 *Default:* False
 
-*Example:* 
-
-== data_transforms_logging_buffer_capacity_bytes
+=== data_transforms_logging_buffer_capacity_bytes
 
 Buffer capacity for transform logs, per shard. Buffer occupancy is calculated as the total size of buffered (i.e. emitted but not yet produced) log messages.
 
@@ -2101,9 +2115,7 @@ Buffer capacity for transform logs, per shard. Buffer occupancy is calculated as
 
 *Default:* 102400
 
-*Example:* 
-
-== data_transforms_logging_flush_interval_ms
+=== data_transforms_logging_flush_interval_ms
 
 Flush interval for transform logs. When a timer expires, pending logs are collected and published to the transform_logs topic.
 
@@ -2119,9 +2131,7 @@ Flush interval for transform logs. When a timer expires, pending logs are collec
 
 *Default:* '500ms'
 
-*Example:* 
-
-== data_transforms_logging_line_max_bytes
+=== data_transforms_logging_line_max_bytes
 
 Transform log lines will be truncate to this length. Truncation occurs after any character escaping.
 
@@ -2135,9 +2145,7 @@ Transform log lines will be truncate to this length. Truncation occurs after any
 
 *Default:* 1024
 
-*Example:* 
-
-== data_transforms_per_core_memory_reservation
+=== data_transforms_per_core_memory_reservation
 
 The amount of memory to reserve per core for Data Transform WebAssembly Virtual Machines. Memory is reserved on boot. The maximum number of functions that can be deployed to a cluster is equal to data_transforms_per_core_memory_reservation / data_transforms_per_function_memory_limit
 
@@ -2151,9 +2159,7 @@ The amount of memory to reserve per core for Data Transform WebAssembly Virtual 
 
 *Default:* 20971520
 
-*Example:* 
-
-== data_transforms_per_function_memory_limit
+=== data_transforms_per_function_memory_limit
 
 The amount of memory to give an instance of a Data Transform WebAssembly Virtual Machine. The maximum number of functions that can be deployed to a cluster is equal to data_transforms_per_core_memory_reservation / data_transforms_per_function_memory_limit
 
@@ -2167,9 +2173,7 @@ The amount of memory to give an instance of a Data Transform WebAssembly Virtual
 
 *Default:* 2097152
 
-*Example:* 
-
-== data_transforms_runtime_limit_ms
+=== data_transforms_runtime_limit_ms
 
 The maximum amount of runtime for startup time of a data transform, and the time it takes for a single record to be transformed.
 
@@ -2185,9 +2189,7 @@ The maximum amount of runtime for startup time of a data transform, and the time
 
 *Default:* '3s'
 
-*Example:* 
-
-== default_num_windows
+=== default_num_windows
 
 Default number of quota tracking windows
 
@@ -2203,9 +2205,7 @@ Default number of quota tracking windows
 
 *Default:* 10
 
-*Example:* 
-
-== default_topic_partitions
+=== default_topic_partitions
 
 Default number of partitions per topic
 
@@ -2221,9 +2221,7 @@ Default number of partitions per topic
 
 *Default:* 1
 
-*Example:* 
-
-== default_topic_replication
+=== default_topic_replication
 
 Default replication factor for new topics
 
@@ -2239,9 +2237,7 @@ Default replication factor for new topics
 
 *Default:* 1
 
-*Example:* 
-
-== default_window_sec
+=== default_window_sec
 
 Default quota tracking window size in milliseconds
 
@@ -2257,25 +2253,7 @@ Default quota tracking window size in milliseconds
 
 *Default:* 'std::chrono::milliseconds(1000)'
 
-*Example:* 
-
-== developer_mode
-
-Skips most of the checks performed at startup, not recomended for production use
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* tunable
-
-*Type:* boolean
-
-*Default:* False
-
-*Example:* 
-
-== disable_batch_cache
+=== disable_batch_cache
 
 Disable batch cache in log manager
 
@@ -2289,9 +2267,7 @@ Disable batch cache in log manager
 
 *Default:* False
 
-*Example:* 
-
-== disable_cluster_recovery_loop_for_tests
+=== disable_cluster_recovery_loop_for_tests
 
 Disables the cluster recovery loop. The property exists to simplify testing and shouldn't be set in production.
 
@@ -2305,9 +2281,35 @@ Disables the cluster recovery loop. The property exists to simplify testing and 
 
 *Default:* False
 
-*Example:* 
+=== disable_metrics
 
-== disk_reservation_percent
+Disable registering metrics exposed on the internal metrics endpoint (/metrics)
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* boolean
+
+*Default:* False
+
+=== disable_public_metrics
+
+Disable registering metrics exposed on the public metrics endpoint (/public_metrics)
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* boolean
+
+*Default:* False
+
+=== disk_reservation_percent
 
 The percentage of total disk capacity that Redpanda will avoid using. This applies both when cloud cache and log data share a disk, as well as when cloud cache uses a dedicated disk. It is recommended to not run disks near capacity to avoid blocking I/O due to low disk space, as well as avoiding performance issues associated with SSD garbage collection.
 
@@ -2321,41 +2323,7 @@ The percentage of total disk capacity that Redpanda will avoid using. This appli
 
 *Default:* 25.0
 
-*Example:* 
-
-== emergency_disable_data_transforms
-
-Override the cluster enablement setting and disable WebAssembly powered data transforms. Only used as an emergency shutoff button.
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* user
-
-*Type:* boolean
-
-*Default:* False
-
-*Example:* 
-
-== empty_seed_starts_cluster
-
-If true, an empty seed_servers list will denote that this node should form a cluster. At most one node in the cluster should be configured configured with an empty seed_servers list. If no such configured node exists, or if configured to false, all nodes denoted by the seed_servers list must be identical among those nodes' configurations, and those nodes will form the initial cluster.
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* user
-
-*Type:* boolean
-
-*Default:* True
-
-*Example:* 
-
-== enable_cluster_metadata_upload_loop
+=== enable_cluster_metadata_upload_loop
 
 Enables the cluster metadata upload loop.
 
@@ -2369,9 +2337,7 @@ Enables the cluster metadata upload loop.
 
 *Default:* True
 
-*Example:* 
-
-== enable_controller_log_rate_limiting
+=== enable_controller_log_rate_limiting
 
 Enables limiting of controller log write rate
 
@@ -2385,9 +2351,7 @@ Enables limiting of controller log write rate
 
 *Default:* False
 
-*Example:* 
-
-== enable_idempotence
+=== enable_idempotence
 
 Enable idempotent producer
 
@@ -2401,9 +2365,7 @@ Enable idempotent producer
 
 *Default:* True
 
-*Example:* 
-
-== enable_leader_balancer
+=== enable_leader_balancer
 
 Enable automatic leadership rebalancing
 
@@ -2417,9 +2379,7 @@ Enable automatic leadership rebalancing
 
 *Default:* True
 
-*Example:* 
-
-== enable_metrics_reporter
+=== enable_metrics_reporter
 
 Enable cluster metrics reporter
 
@@ -2433,9 +2393,7 @@ Enable cluster metrics reporter
 
 *Default:* True
 
-*Example:* 
-
-== enable_mpx_extensions
+=== enable_mpx_extensions
 
 Enable Redpanda extensions for MPX.
 
@@ -2449,9 +2407,7 @@ Enable Redpanda extensions for MPX.
 
 *Default:* False
 
-*Example:* 
-
-== enable_pid_file
+=== enable_pid_file
 
 Enable pid file. You probably don't want to change this.
 
@@ -2465,9 +2421,7 @@ Enable pid file. You probably don't want to change this.
 
 *Default:* True
 
-*Example:* 
-
-== enable_rack_awareness
+=== enable_rack_awareness
 
 Enables rack-aware replica assignment
 
@@ -2481,9 +2435,7 @@ Enables rack-aware replica assignment
 
 *Default:* False
 
-*Example:* 
-
-== enable_sasl
+=== enable_sasl
 
 Enable SASL authentication for Kafka connections, authorization is required. see also `kafka_enable_authorization`
 
@@ -2497,9 +2449,7 @@ Enable SASL authentication for Kafka connections, authorization is required. see
 
 *Default:* False
 
-*Example:* 
-
-== enable_schema_id_validation
+=== enable_schema_id_validation
 
 Enable Server Side Schema ID Validation.
 
@@ -2513,9 +2463,7 @@ Enable Server Side Schema ID Validation.
 
 *Default:* 'pandaproxy::schema_registry::schema_id_validation_mode::none'
 
-*Example:* 
-
-== enable_transactions
+=== enable_transactions
 
 Enable transactions
 
@@ -2529,9 +2477,7 @@ Enable transactions
 
 *Default:* True
 
-*Example:* 
-
-== enable_usage
+=== enable_usage
 
 Enables the usage tracking mechanism, storing windowed history of kafka/cloud_storage metrics over time
 
@@ -2545,9 +2491,7 @@ Enables the usage tracking mechanism, storing windowed history of kafka/cloud_st
 
 *Default:* False
 
-*Example:* 
-
-== features_auto_enable
+=== features_auto_enable
 
 Whether new feature flags may auto-activate after upgrades (true) or must wait for manual activation via the admin API (false)
 
@@ -2561,9 +2505,7 @@ Whether new feature flags may auto-activate after upgrades (true) or must wait f
 
 *Default:* True
 
-*Example:* 
-
-== fetch_max_bytes
+=== fetch_max_bytes
 
 Maximum number of bytes returned in fetch request
 
@@ -2577,9 +2519,7 @@ Maximum number of bytes returned in fetch request
 
 *Default:* 57671680
 
-*Example:* 
-
-== fetch_read_strategy
+=== fetch_read_strategy
 
 The strategy used to fulfill fetch requests
 
@@ -2593,9 +2533,7 @@ The strategy used to fulfill fetch requests
 
 *Default:* 'model::fetch_read_strategy::non_polling'
 
-*Example:* 
-
-== fetch_reads_debounce_timeout
+=== fetch_reads_debounce_timeout
 
 Time to wait for next read in fetch request when requested min bytes wasn't reached
 
@@ -2611,9 +2549,7 @@ Time to wait for next read in fetch request when requested min bytes wasn't reac
 
 *Default:* '1ms'
 
-*Example:* 
-
-== fetch_session_eviction_timeout_ms
+=== fetch_session_eviction_timeout_ms
 
 Minimum time before which unused session will get evicted from sessions. Maximum time after which inactive session will be deleted is two time given configuration valuecache
 
@@ -2629,9 +2565,7 @@ Minimum time before which unused session will get evicted from sessions. Maximum
 
 *Default:* '60s'
 
-*Example:* 
-
-== find_coordinator_timeout_ms
+=== find_coordinator_timeout_ms
 
 Time to wait for a response from tx_registry
 
@@ -2647,9 +2581,7 @@ Time to wait for a response from tx_registry
 
 *Default:* '2000ms'
 
-*Example:* 
-
-== group_initial_rebalance_delay
+=== group_initial_rebalance_delay
 
 Extra delay (ms) added to rebalance phase to wait for new members
 
@@ -2665,9 +2597,39 @@ Extra delay (ms) added to rebalance phase to wait for new members
 
 *Default:* '3s'
 
-*Example:* 
+=== group_max_session_timeout_ms
 
-== group_new_member_join_timeout
+The maximum allowed session timeout for registered consumers. Longer timeouts give consumers more time to process messages in between heartbeats at the cost of a longer time to detect failures. 
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '300s'
+
+=== group_min_session_timeout_ms
+
+The minimum allowed session timeout for registered consumers. Shorter timeouts result in quicker failure detection at the cost of more frequent consumer heartbeating, which can overwhelm broker resources.
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '6000ms'
+
+=== group_new_member_join_timeout
 
 Timeout for new member joins
 
@@ -2683,9 +2645,7 @@ Timeout for new member joins
 
 *Default:* "30'000ms"
 
-*Example:* 
-
-== group_offset_retention_check_ms
+=== group_offset_retention_check_ms
 
 How often the system should check for expired group offsets.
 
@@ -2701,9 +2661,7 @@ How often the system should check for expired group offsets.
 
 *Default:* '10min'
 
-*Example:* 
-
-== group_offset_retention_sec
+=== group_offset_retention_sec
 
 Consumer group offset retention seconds. Offset retention can be disabled by setting this value to null.
 
@@ -2719,9 +2677,7 @@ Consumer group offset retention seconds. Offset retention can be disabled by set
 
 *Default:* '24h * 7'
 
-*Example:* 
-
-== group_topic_partitions
+=== group_topic_partitions
 
 Number of partitions in the internal group membership topic
 
@@ -2737,9 +2693,7 @@ Number of partitions in the internal group membership topic
 
 *Default:* 16
 
-*Example:* 
-
-== health_manager_tick_interval
+=== health_manager_tick_interval
 
 How often the health manager runs
 
@@ -2755,9 +2709,7 @@ How often the health manager runs
 
 *Default:* '3min'
 
-*Example:* 
-
-== health_monitor_max_metadata_age
+=== health_monitor_max_metadata_age
 
 Max age of metadata cached in the health monitor of non controller node
 
@@ -2773,9 +2725,7 @@ Max age of metadata cached in the health monitor of non controller node
 
 *Default:* '10s'
 
-*Example:* 
-
-== http_authentication
+=== http_authentication
 
 A list of supported HTTP authentication mechanisms. `BASIC` and `OIDC` are allowed.
 
@@ -2789,9 +2739,7 @@ A list of supported HTTP authentication mechanisms. `BASIC` and `OIDC` are allow
 
 *Default:* ['BASIC']
 
-*Example:* 
-
-== id_allocator_batch_size
+=== id_allocator_batch_size
 
 Id allocator allocates messages in batches (each batch is a one log record) and then serves requests from memory without touching the log until the batch is exhausted.
 
@@ -2807,9 +2755,7 @@ Id allocator allocates messages in batches (each batch is a one log record) and 
 
 *Default:* 1000
 
-*Example:* 
-
-== id_allocator_log_capacity
+=== id_allocator_log_capacity
 
 Capacity of the id_allocator log in number of batches. Once it reached id_allocator_stm truncates log's prefix.
 
@@ -2825,9 +2771,7 @@ Capacity of the id_allocator log in number of batches. Once it reached id_alloca
 
 *Default:* 100
 
-*Example:* 
-
-== initial_retention_local_target_bytes_default
+=== initial_retention_local_target_bytes_default
 
 Initial local retention size target for partitions of topics with cloud storage write enabled. If no initial local target retention is configured all locally retained data will be delivered to learner when joining partition replica set
 
@@ -2841,9 +2785,7 @@ Initial local retention size target for partitions of topics with cloud storage 
 
 *Default:* None
 
-*Example:* 
-
-== initial_retention_local_target_ms_default
+=== initial_retention_local_target_ms_default
 
 Initial local retention time target for partitions of topics with cloud storage write enabled. If no initial local target retention is configured all locally retained data will be delivered to learner when joining partition replica set
 
@@ -2859,9 +2801,7 @@ Initial local retention time target for partitions of topics with cloud storage 
 
 *Default:* None
 
-*Example:* 
-
-== internal_topic_replication_factor
+=== internal_topic_replication_factor
 
 Target replication factor for internal topics
 
@@ -2877,9 +2817,7 @@ Target replication factor for internal topics
 
 *Default:* 3
 
-*Example:* 
-
-== join_retry_timeout_ms
+=== join_retry_timeout_ms
 
 Time between cluster join retries in milliseconds
 
@@ -2895,9 +2833,7 @@ Time between cluster join retries in milliseconds
 
 *Default:* '5s'
 
-*Example:* 
-
-== kafka_admin_topic_api_rate
+=== kafka_admin_topic_api_rate
 
 Target quota rate (partition mutations per default_window_sec)
 
@@ -2913,41 +2849,7 @@ Target quota rate (partition mutations per default_window_sec)
 
 *Default:* None
 
-*Example:* 
-
-== kafka_api
-
-Address and port of an interface to listen for Kafka API requests
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* user
-
-*Type:* #/definitions/config::broker_authn_endpoint
-
-*Default:* {'address': 'net::unresolved_address("127.0.0.1", 9092)', 'authn_method': 'std::nullopt'}
-
-*Example:* 
-
-== kafka_api_tls
-
-TLS configuration for Kafka API endpoint
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* user
-
-*Type:* #/definitions/endpoint_tls_config
-
-*Default:* None
-
-*Example:* 
-
-== kafka_batch_max_bytes
+=== kafka_batch_max_bytes
 
 Maximum size of a batch processed by server. If batch is compressed the limit applies to compressed batch size
 
@@ -2963,9 +2865,7 @@ Maximum size of a batch processed by server. If batch is compressed the limit ap
 
 *Default:* 1048576
 
-*Example:* 
-
-== kafka_client_group_byte_rate_quota
+=== kafka_client_group_byte_rate_quota
 
 Per-group target produce quota byte rate (bytes per second). Client is considered part of the group if client_id contains clients_prefix
 
@@ -2979,9 +2879,7 @@ Per-group target produce quota byte rate (bytes per second). Client is considere
 
 *Default:* None
 
-*Example:* 
-
-== kafka_client_group_fetch_byte_rate_quota
+=== kafka_client_group_fetch_byte_rate_quota
 
 Per-group target fetch quota byte rate (bytes per second). Client is considered part of the group if client_id contains clients_prefix
 
@@ -2995,9 +2893,7 @@ Per-group target fetch quota byte rate (bytes per second). Client is considered 
 
 *Default:* None
 
-*Example:* 
-
-== kafka_connection_rate_limit
+=== kafka_connection_rate_limit
 
 Maximum connections per second for one core
 
@@ -3013,9 +2909,7 @@ Maximum connections per second for one core
 
 *Default:* None
 
-*Example:* 
-
-== kafka_connection_rate_limit_overrides
+=== kafka_connection_rate_limit_overrides
 
 Overrides for specific ips for maximum connections per second for one core
 
@@ -3029,9 +2923,7 @@ Overrides for specific ips for maximum connections per second for one core
 
 *Default:* None
 
-*Example:* 
-
-== kafka_connections_max
+=== kafka_connections_max
 
 Maximum number of Kafka client connections per broker
 
@@ -3047,9 +2939,7 @@ Maximum number of Kafka client connections per broker
 
 *Default:* None
 
-*Example:* 
-
-== kafka_connections_max_overrides
+=== kafka_connections_max_overrides
 
 Per-IP overrides of kafka connection count limit, list of <ip>:<count> strings
 
@@ -3063,9 +2953,7 @@ Per-IP overrides of kafka connection count limit, list of <ip>:<count> strings
 
 *Default:* None
 
-*Example:* 
-
-== kafka_connections_max_per_ip
+=== kafka_connections_max_per_ip
 
 Maximum number of Kafka client connections from each IP address, per broker
 
@@ -3081,9 +2969,7 @@ Maximum number of Kafka client connections from each IP address, per broker
 
 *Default:* None
 
-*Example:* 
-
-== kafka_enable_authorization
+=== kafka_enable_authorization
 
 Enable authorization for Kafka connections. Values:- `nil`: Ignored. Authorization is enabled with `enable_sasl: true`; `true`: authorization is required; `false`: authorization is disabled. See also: `enable_sasl` and `kafka_api[].authentication_method`
 
@@ -3097,9 +2983,7 @@ Enable authorization for Kafka connections. Values:- `nil`: Ignored. Authorizati
 
 *Default:* None
 
-*Example:* 
-
-== kafka_enable_describe_log_dirs_remote_storage
+=== kafka_enable_describe_log_dirs_remote_storage
 
 Whether to include tiered storage as a special remote:// directory in DescribeLogDirs Kafka API requests.
 
@@ -3113,9 +2997,7 @@ Whether to include tiered storage as a special remote:// directory in DescribeLo
 
 *Default:* True
 
-*Example:* 
-
-== kafka_enable_partition_reassignment
+=== kafka_enable_partition_reassignment
 
 Enable the Kafka partition reassignment API
 
@@ -3129,9 +3011,7 @@ Enable the Kafka partition reassignment API
 
 *Default:* True
 
-*Example:* 
-
-== kafka_group_recovery_timeout_ms
+=== kafka_group_recovery_timeout_ms
 
 Kafka group recovery timeout expressed in milliseconds
 
@@ -3147,9 +3027,7 @@ Kafka group recovery timeout expressed in milliseconds
 
 *Default:* "30'000ms"
 
-*Example:* 
-
-== kafka_max_bytes_per_fetch
+=== kafka_max_bytes_per_fetch
 
 Limit fetch responses to this many bytes, even if total of partition bytes limits is higher
 
@@ -3163,9 +3041,7 @@ Limit fetch responses to this many bytes, even if total of partition bytes limit
 
 *Default:* 67108864
 
-*Example:* 
-
-== kafka_memory_batch_size_estimate_for_fetch
+=== kafka_memory_batch_size_estimate_for_fetch
 
 The size of the batch used to estimate memory consumption for Fetch requests, in bytes. Smaller sizes allow more concurrent fetch requests per shard, larger sizes prevent running out of memory because of too many concurrent fetch requests.
 
@@ -3179,9 +3055,7 @@ The size of the batch used to estimate memory consumption for Fetch requests, in
 
 *Default:* 1048576
 
-*Example:* 
-
-== kafka_memory_share_for_fetch
+=== kafka_memory_share_for_fetch
 
 The share of kafka subsystem memory that can be used for fetch read buffers, as a fraction of kafka subsystem memory amount
 
@@ -3195,9 +3069,7 @@ The share of kafka subsystem memory that can be used for fetch read buffers, as 
 
 *Default:* 0.5
 
-*Example:* 
-
-== kafka_mtls_principal_mapping_rules
+=== kafka_mtls_principal_mapping_rules
 
 Principal Mapping Rules for mTLS Authentication on the Kafka API
 
@@ -3211,9 +3083,7 @@ Principal Mapping Rules for mTLS Authentication on the Kafka API
 
 *Default:* None
 
-*Example:* 
-
-== kafka_nodelete_topics
+=== kafka_nodelete_topics
 
 Prevents the topics in the list from being deleted via the kafka api
 
@@ -3227,9 +3097,7 @@ Prevents the topics in the list from being deleted via the kafka api
 
 *Default:* '{model::kafka_audit_logging_topic(), "__consumer_offsets", "_schemas"}'
 
-*Example:* 
-
-== kafka_noproduce_topics
+=== kafka_noproduce_topics
 
 Prevents the topics in the list from having message produced to them via the kafka api
 
@@ -3243,9 +3111,7 @@ Prevents the topics in the list from having message produced to them via the kaf
 
 *Default:* None
 
-*Example:* 
-
-== kafka_qdc_depth_alpha
+=== kafka_qdc_depth_alpha
 
 Smoothing factor for kafka queue depth control depth tracking.
 
@@ -3259,9 +3125,7 @@ Smoothing factor for kafka queue depth control depth tracking.
 
 *Default:* 0.8
 
-*Example:* 
-
-== kafka_qdc_depth_update_ms
+=== kafka_qdc_depth_update_ms
 
 Update frequency for kafka queue depth control.
 
@@ -3277,9 +3141,7 @@ Update frequency for kafka queue depth control.
 
 *Default:* '7s'
 
-*Example:* 
-
-== kafka_qdc_enable
+=== kafka_qdc_enable
 
 Enable kafka queue depth control.
 
@@ -3293,9 +3155,7 @@ Enable kafka queue depth control.
 
 *Default:* False
 
-*Example:* 
-
-== kafka_qdc_idle_depth
+=== kafka_qdc_idle_depth
 
 Queue depth when idleness is detected in kafka queue depth control.
 
@@ -3309,9 +3169,7 @@ Queue depth when idleness is detected in kafka queue depth control.
 
 *Default:* 10
 
-*Example:* 
-
-== kafka_qdc_latency_alpha
+=== kafka_qdc_latency_alpha
 
 Smoothing parameter for kafka queue depth control latency tracking.
 
@@ -3325,9 +3183,7 @@ Smoothing parameter for kafka queue depth control latency tracking.
 
 *Default:* 0.002
 
-*Example:* 
-
-== kafka_qdc_max_depth
+=== kafka_qdc_max_depth
 
 Maximum queue depth used in kafka queue depth control.
 
@@ -3341,9 +3197,7 @@ Maximum queue depth used in kafka queue depth control.
 
 *Default:* 100
 
-*Example:* 
-
-== kafka_qdc_max_latency_ms
+=== kafka_qdc_max_latency_ms
 
 Max latency threshold for kafka queue depth control depth tracking.
 
@@ -3359,9 +3213,7 @@ Max latency threshold for kafka queue depth control depth tracking.
 
 *Default:* '80ms'
 
-*Example:* 
-
-== kafka_qdc_min_depth
+=== kafka_qdc_min_depth
 
 Minimum queue depth used in kafka queue depth control.
 
@@ -3375,9 +3227,7 @@ Minimum queue depth used in kafka queue depth control.
 
 *Default:* 1
 
-*Example:* 
-
-== kafka_qdc_window_count
+=== kafka_qdc_window_count
 
 Number of windows used in kafka queue depth control latency tracking.
 
@@ -3391,9 +3241,7 @@ Number of windows used in kafka queue depth control latency tracking.
 
 *Default:* 12
 
-*Example:* 
-
-== kafka_qdc_window_size_ms
+=== kafka_qdc_window_size_ms
 
 Window size for kafka queue depth control latency tracking.
 
@@ -3409,9 +3257,7 @@ Window size for kafka queue depth control latency tracking.
 
 *Default:* '1500ms'
 
-*Example:* 
-
-== kafka_quota_balancer_min_shard_throughput_bps
+=== kafka_quota_balancer_min_shard_throughput_bps
 
 The lowest value of the throughput quota a shard can get in the process of quota balancing, in bytes/s. 0 means there is no minimum.
 
@@ -3427,9 +3273,7 @@ The lowest value of the throughput quota a shard can get in the process of quota
 
 *Default:* 256
 
-*Example:* 
-
-== kafka_quota_balancer_min_shard_throughput_ratio
+=== kafka_quota_balancer_min_shard_throughput_ratio
 
 The lowest value of the throughput quota a shard can get in the process of quota balancing, expressed as a ratio of default shard quota. 0 means there is no minimum, 1 means no quota can be taken away by the balancer.
 
@@ -3443,9 +3287,7 @@ The lowest value of the throughput quota a shard can get in the process of quota
 
 *Default:* 0.01
 
-*Example:* 
-
-== kafka_quota_balancer_node_period
+=== kafka_quota_balancer_node_period
 
 Intra-node throughput quota balancer invocation period, in milliseconds. Value of 0 disables the balancer and makes all the throughput quotas immutable.
 
@@ -3461,9 +3303,7 @@ Intra-node throughput quota balancer invocation period, in milliseconds. Value o
 
 *Default:* '750ms'
 
-*Example:* 
-
-== kafka_quota_balancer_window
+=== kafka_quota_balancer_window
 
 Time window used to average current throughput measurement for quota balancer, in milliseconds
 
@@ -3479,9 +3319,7 @@ Time window used to average current throughput measurement for quota balancer, i
 
 *Default:* '5000ms'
 
-*Example:* 
-
-== kafka_request_max_bytes
+=== kafka_request_max_bytes
 
 Maximum size of a single request processed via Kafka API
 
@@ -3497,9 +3335,7 @@ Maximum size of a single request processed via Kafka API
 
 *Default:* 104857600
 
-*Example:* 
-
-== kafka_rpc_server_stream_recv_buf
+=== kafka_rpc_server_stream_recv_buf
 
 Userspace receive buffer max size in bytes
 
@@ -3513,9 +3349,39 @@ Userspace receive buffer max size in bytes
 
 *Default:* None
 
-*Example:* 
+=== kafka_rpc_server_tcp_recv_buf
 
-== kafka_sasl_max_reauth_ms
+Kafka server TCP receive buffer size in bytes.
+
+*Requires Restart:* No
+
+*Nullable:* Yes
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-2147483648, 2147483647]
+
+*Default:* None
+
+=== kafka_rpc_server_tcp_send_buf
+
+Kafka server TCP transmit buffer size in bytes.
+
+*Requires Restart:* No
+
+*Nullable:* Yes
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-2147483648, 2147483647]
+
+*Default:* None
+
+=== kafka_sasl_max_reauth_ms
 
 The maximum time between Kafka client reauthentications. If a client has not reauthenticated a connection within this time frame, that connection is torn down. Without this, a connection could live long after the client's credentials are expired or revoked. Session expiry is disabled if the value is null.
 
@@ -3531,9 +3397,7 @@ The maximum time between Kafka client reauthentications. If a client has not rea
 
 *Default:* None
 
-*Example:* 
-
-== kafka_schema_id_validation_cache_capacity
+=== kafka_schema_id_validation_cache_capacity
 
 Per-shard capacity of the cache for validating schema IDs.
 
@@ -3547,9 +3411,7 @@ Per-shard capacity of the cache for validating schema IDs.
 
 *Default:* 128
 
-*Example:* 
-
-== kafka_tcp_keepalive_idle_timeout_seconds
+=== kafka_tcp_keepalive_idle_timeout_seconds
 
 TCP keepalive idle timeout in seconds for kafka connections. This describes the timeout between tcp keepalive probes that the remote sitesuccessfully acknowledged. Refers to the TCP_KEEPIDLE socket option. When changed applies to new connections only.
 
@@ -3565,9 +3427,7 @@ TCP keepalive idle timeout in seconds for kafka connections. This describes the 
 
 *Default:* '120s'
 
-*Example:* 
-
-== kafka_tcp_keepalive_probe_interval_seconds
+=== kafka_tcp_keepalive_probe_interval_seconds
 
 TCP keepalive probe interval in seconds for kafka connections. This describes the timeout between unacknowledged tcp keepalives. Refers to the TCP_KEEPINTVL socket option. When changed applies to new connections only.
 
@@ -3583,9 +3443,7 @@ TCP keepalive probe interval in seconds for kafka connections. This describes th
 
 *Default:* '60s'
 
-*Example:* 
-
-== kafka_tcp_keepalive_probes
+=== kafka_tcp_keepalive_probes
 
 TCP keepalive unacknowledged probes until the connection is considered dead for kafka connections. Refers to the TCP_KEEPCNT socket option. When changed applies to new connections only.
 
@@ -3601,9 +3459,7 @@ TCP keepalive unacknowledged probes until the connection is considered dead for 
 
 *Default:* 3
 
-*Example:* 
-
-== kafka_throughput_control
+=== kafka_throughput_control
 
 List of throughput control groups that define exclusions from node-wide throughput limits. Each group consists of: ("name" (optional) - any unique group name, "client_id" - regex to match client_id). A connection is assigned the first matching group, then the connection is excluded from throughput control.
 
@@ -3617,9 +3473,7 @@ List of throughput control groups that define exclusions from node-wide throughp
 
 *Default:* None
 
-*Example:* 
-
-== kafka_throughput_controlled_api_keys
+=== kafka_throughput_controlled_api_keys
 
 List of Kafka API keys that are subject to cluster-wide and node-wide throughput limit control
 
@@ -3633,9 +3487,7 @@ List of Kafka API keys that are subject to cluster-wide and node-wide throughput
 
 *Default:* ['produce', 'fetch']
 
-*Example:* 
-
-== kafka_throughput_limit_node_in_bps
+=== kafka_throughput_limit_node_in_bps
 
 Node wide throughput ingress limit - maximum kafka traffic throughput allowed on the ingress side of each node, in bytes/s. Default is no limit.
 
@@ -3651,9 +3503,7 @@ Node wide throughput ingress limit - maximum kafka traffic throughput allowed on
 
 *Default:* None
 
-*Example:* 
-
-== kafka_throughput_limit_node_out_bps
+=== kafka_throughput_limit_node_out_bps
 
 Node wide throughput egress limit - maximum kafka traffic throughput allowed on the egress side of each node, in bytes/s. Default is no limit.
 
@@ -3669,9 +3519,7 @@ Node wide throughput egress limit - maximum kafka traffic throughput allowed on 
 
 *Default:* None
 
-*Example:* 
-
-== kafka_throughput_replenish_threshold
+=== kafka_throughput_replenish_threshold
 
 Threshold for refilling the token bucket. Will be clamped between 1 and kafka_throughput_limit_node_*_bps.
 
@@ -3687,9 +3535,7 @@ Threshold for refilling the token bucket. Will be clamped between 1 and kafka_th
 
 *Default:* None
 
-*Example:* 
-
-== kafka_throughput_throttling_v2
+=== kafka_throughput_throttling_v2
 
 Use throughput throttling based on a shared token bucket instead of balancing quota between shards
 
@@ -3703,9 +3549,7 @@ Use throughput throttling based on a shared token bucket instead of balancing qu
 
 *Default:* True
 
-*Example:* 
-
-== kvstore_flush_interval
+=== kvstore_flush_interval
 
 Key-value store flush interval (ms)
 
@@ -3721,9 +3565,7 @@ Key-value store flush interval (ms)
 
 *Default:* 'std::chrono::milliseconds(10)'
 
-*Example:* 
-
-== kvstore_max_segment_size
+=== kvstore_max_segment_size
 
 Key-value maximum segment size (bytes)
 
@@ -3737,9 +3579,7 @@ Key-value maximum segment size (bytes)
 
 *Default:* 16777216
 
-*Example:* 
-
-== leader_balancer_idle_timeout
+=== leader_balancer_idle_timeout
 
 Leadership rebalancing idle timeout
 
@@ -3755,9 +3595,7 @@ Leadership rebalancing idle timeout
 
 *Default:* '2min'
 
-*Example:* 
-
-== leader_balancer_mode
+=== leader_balancer_mode
 
 Leader balancer mode
 
@@ -3771,9 +3609,7 @@ Leader balancer mode
 
 *Default:* 'model::leader_balancer_mode::random_hill_climbing'
 
-*Example:* 
-
-== leader_balancer_mute_timeout
+=== leader_balancer_mute_timeout
 
 Leadership rebalancing mute timeout
 
@@ -3789,9 +3625,7 @@ Leadership rebalancing mute timeout
 
 *Default:* '5min'
 
-*Example:* 
-
-== leader_balancer_node_mute_timeout
+=== leader_balancer_node_mute_timeout
 
 Leadership rebalancing node mute timeout
 
@@ -3807,9 +3641,7 @@ Leadership rebalancing node mute timeout
 
 *Default:* '20s'
 
-*Example:* 
-
-== leader_balancer_transfer_limit_per_shard
+=== leader_balancer_transfer_limit_per_shard
 
 Per shard limit for in progress leadership transfers
 
@@ -3823,9 +3655,7 @@ Per shard limit for in progress leadership transfers
 
 *Default:* 512
 
-*Example:* 
-
-== legacy_group_offset_retention_enabled
+=== legacy_group_offset_retention_enabled
 
 Group offset retention is enabled by default in versions of Redpanda >= 23.1. To enable offset retention after upgrading from an older version set this option to true.
 
@@ -3839,9 +3669,7 @@ Group offset retention is enabled by default in versions of Redpanda >= 23.1. To
 
 *Default:* False
 
-*Example:* 
-
-== legacy_permit_unsafe_log_operation
+=== legacy_permit_unsafe_log_operation
 
 Permits the use of strings that may induct log injection/modification
 
@@ -3855,9 +3683,7 @@ Permits the use of strings that may induct log injection/modification
 
 *Default:* True
 
-*Example:* 
-
-== legacy_unsafe_log_warning_interval_sec
+=== legacy_unsafe_log_warning_interval_sec
 
 Interval, in seconds, of how often a message informing the operator that unsafe strings are permitted
 
@@ -3873,9 +3699,7 @@ Interval, in seconds, of how often a message informing the operator that unsafe 
 
 *Default:* '300s'
 
-*Example:* 
-
-== log_cleanup_policy
+=== log_cleanup_policy
 
 Default topic cleanup policy
 
@@ -3889,9 +3713,7 @@ Default topic cleanup policy
 
 *Default:* 'model::cleanup_policy_bitflags::deletion'
 
-*Example:* 
-
-== log_compaction_interval_ms
+=== log_compaction_interval_ms
 
 How often do we trigger background compaction
 
@@ -3907,9 +3729,7 @@ How often do we trigger background compaction
 
 *Default:* '10s'
 
-*Example:* 
-
-== log_compaction_use_sliding_window
+=== log_compaction_use_sliding_window
 
 Use sliding window compaction.
 
@@ -3923,9 +3743,7 @@ Use sliding window compaction.
 
 *Default:* True
 
-*Example:* 
-
-== log_compression_type
+=== log_compression_type
 
 Default topic compression type
 
@@ -3939,9 +3757,7 @@ Default topic compression type
 
 *Default:* 'model::compression::producer'
 
-*Example:* 
-
-== log_disable_housekeeping_for_tests
+=== log_disable_housekeeping_for_tests
 
 Disables the housekeeping loop for local storage. The property exists to simplify testing and shouldn't be set in production.
 
@@ -3955,9 +3771,7 @@ Disables the housekeeping loop for local storage. The property exists to simplif
 
 *Default:* False
 
-*Example:* 
-
-== log_message_timestamp_alert_after_ms
+=== log_message_timestamp_alert_after_ms
 
 Threshold in milliseconds for alerting on messages with a timestamp after the broker's time, meaning they are in the future relative to the broker's clock.
 
@@ -3973,9 +3787,7 @@ Threshold in milliseconds for alerting on messages with a timestamp after the br
 
 *Default:* '2h'
 
-*Example:* 
-
-== log_message_timestamp_alert_before_ms
+=== log_message_timestamp_alert_before_ms
 
 Threshold in milliseconds for alerting on messages with a timestamp before the broker's time, meaning they are in the past relative to the broker's clock. null to disable this check
 
@@ -3991,9 +3803,7 @@ Threshold in milliseconds for alerting on messages with a timestamp before the b
 
 *Default:* None
 
-*Example:* 
-
-== log_message_timestamp_type
+=== log_message_timestamp_type
 
 Default topic messages timestamp type
 
@@ -4007,9 +3817,7 @@ Default topic messages timestamp type
 
 *Default:* 'model::timestamp_type::create_time'
 
-*Example:* 
-
-== log_retention_ms
+=== log_retention_ms
 
 delete segments older than this - default 1 week
 
@@ -4023,9 +3831,7 @@ delete segments older than this - default 1 week
 
 *Default:* '7 * 24h'
 
-*Example:* 
-
-== log_segment_ms
+=== log_segment_ms
 
 Default log segment lifetime in ms for topics which do not set segment.ms
 
@@ -4041,9 +3847,7 @@ Default log segment lifetime in ms for topics which do not set segment.ms
 
 *Default:* 'std::chrono::weeks{2}'
 
-*Example:* 
-
-== log_segment_ms_max
+=== log_segment_ms_max
 
 Upper bound on topic segment.ms: higher values will be clamped to this value
 
@@ -4059,9 +3863,7 @@ Upper bound on topic segment.ms: higher values will be clamped to this value
 
 *Default:* '24h * 365'
 
-*Example:* 
-
-== log_segment_ms_min
+=== log_segment_ms_min
 
 Lower bound on topic segment.ms: lower values will be clamped to this value
 
@@ -4077,9 +3879,7 @@ Lower bound on topic segment.ms: lower values will be clamped to this value
 
 *Default:* '10min'
 
-*Example:* 
-
-== log_segment_size
+=== log_segment_size
 
 Default log segment size in bytes for topics which do not set segment.bytes
 
@@ -4095,9 +3895,7 @@ Default log segment size in bytes for topics which do not set segment.bytes
 
 *Default:* 134217728
 
-*Example:* 
-
-== log_segment_size_jitter_percent
+=== log_segment_size_jitter_percent
 
 Random variation to the segment size limit used for each partition
 
@@ -4113,9 +3911,7 @@ Random variation to the segment size limit used for each partition
 
 *Default:* 5
 
-*Example:* 
-
-== log_segment_size_max
+=== log_segment_size_max
 
 Upper bound on topic segment.bytes: higher values will be clamped to this limit
 
@@ -4131,9 +3927,7 @@ Upper bound on topic segment.bytes: higher values will be clamped to this limit
 
 *Default:* None
 
-*Example:* 
-
-== log_segment_size_min
+=== log_segment_size_min
 
 Lower bound on topic segment.bytes: lower values will be clamped to this limit
 
@@ -4149,9 +3943,7 @@ Lower bound on topic segment.bytes: lower values will be clamped to this limit
 
 *Default:* 1048576
 
-*Example:* 
-
-== max_compacted_log_segment_size
+=== max_compacted_log_segment_size
 
 Max compacted segment size after consolidation
 
@@ -4165,9 +3957,7 @@ Max compacted segment size after consolidation
 
 *Default:* 5368709120
 
-*Example:* 
-
-== max_concurrent_producer_ids
+=== max_concurrent_producer_ids
 
 Max number of the active sessions (producers). When the threshold is passed Redpanda terminates old sessions. When an idle producer corresponding to the terminated session wakes up and produces - it leads to its batches being rejected with out of order sequence error.
 
@@ -4183,9 +3973,7 @@ Max number of the active sessions (producers). When the threshold is passed Redp
 
 *Default:* 'std::numeric_limits<uint64_t>::max()'
 
-*Example:* 
-
-== max_in_flight_pandaproxy_requests_per_shard
+=== max_in_flight_pandaproxy_requests_per_shard
 
 Maximum number of in flight HTTP requests permitted in pandaproxy per shard.  Any additional requests above this limit will be rejected with a 429 error
 
@@ -4199,9 +3987,7 @@ Maximum number of in flight HTTP requests permitted in pandaproxy per shard.  An
 
 *Default:* 500
 
-*Example:* 
-
-== max_in_flight_schema_registry_requests_per_shard
+=== max_in_flight_schema_registry_requests_per_shard
 
 Maximum number of in flight HTTP requests permitted in schema registry per shard.  Any additional requests above this limit will be rejected with a 429 error
 
@@ -4215,9 +4001,7 @@ Maximum number of in flight HTTP requests permitted in schema registry per shard
 
 *Default:* 500
 
-*Example:* 
-
-== max_kafka_throttle_delay_ms
+=== max_kafka_throttle_delay_ms
 
 Fail-safe maximum throttle delay on kafka requests
 
@@ -4233,9 +4017,7 @@ Fail-safe maximum throttle delay on kafka requests
 
 *Default:* "30'000ms"
 
-*Example:* 
-
-== max_transactions_per_coordinator
+=== max_transactions_per_coordinator
 
 Max number of the active txn sessions (producers). When the threshold is passed Redpanda terminates old sessions. When an idle producer corresponding to the terminated session wakes up and produces - it leads to its batches being rejected with invalid producer epoch or invalid_producer_id_mapping (it depends on the txn execution phase).
 
@@ -4251,9 +4033,7 @@ Max number of the active txn sessions (producers). When the threshold is passed 
 
 *Default:* 'std::numeric_limits<uint64_t>::max()'
 
-*Example:* 
-
-== members_backend_retry_ms
+=== members_backend_retry_ms
 
 Time between members backend reconciliation loop retries 
 
@@ -4269,9 +4049,7 @@ Time between members backend reconciliation loop retries
 
 *Default:* '5s'
 
-*Example:* 
-
-== memory_abort_on_alloc_failure
+=== memory_abort_on_alloc_failure
 
 If true, the redpanda process will terminate immediately when an allocation cannot be satisfied due to memory exhaustion. If false, an exception is thrown instead.
 
@@ -4285,25 +4063,7 @@ If true, the redpanda process will terminate immediately when an allocation cann
 
 *Default:* True
 
-*Example:* 
-
-== memory_allocation_warning_threshold
-
-Enables log messages for allocations greater than the given size.
-
-*Requires Restart:* No
-
-*Nullable:* Yes
-
-*Visibility:* tunable
-
-*Type:* integer
-
-*Default:* '128_KiB + 1'
-
-*Example:* 
-
-== metadata_dissemination_interval_ms
+=== metadata_dissemination_interval_ms
 
 Interval for metadata dissemination batching
 
@@ -4319,9 +4079,7 @@ Interval for metadata dissemination batching
 
 *Default:* "3'000ms"
 
-*Example:* 
-
-== metadata_dissemination_retries
+=== metadata_dissemination_retries
 
 Number of attempts of looking up a topic's meta data like shard before failing a request
 
@@ -4337,9 +4095,7 @@ Number of attempts of looking up a topic's meta data like shard before failing a
 
 *Default:* 30
 
-*Example:* 
-
-== metadata_dissemination_retry_delay_ms
+=== metadata_dissemination_retry_delay_ms
 
 Delay before retry a topic lookup in a shard or other meta tables
 
@@ -4355,9 +4111,7 @@ Delay before retry a topic lookup in a shard or other meta tables
 
 *Default:* "0'500ms"
 
-*Example:* 
-
-== metadata_status_wait_timeout_ms
+=== metadata_status_wait_timeout_ms
 
 Maximum time to wait in metadata request for cluster health to be refreshed
 
@@ -4373,9 +4127,7 @@ Maximum time to wait in metadata request for cluster health to be refreshed
 
 *Default:* '2s'
 
-*Example:* 
-
-== metrics_reporter_report_interval
+=== metrics_reporter_report_interval
 
 cluster metrics reporter report interval
 
@@ -4391,9 +4143,7 @@ cluster metrics reporter report interval
 
 *Default:* '24h'
 
-*Example:* 
-
-== metrics_reporter_tick_interval
+=== metrics_reporter_tick_interval
 
 Cluster metrics reporter tick interval
 
@@ -4409,9 +4159,7 @@ Cluster metrics reporter tick interval
 
 *Default:* '1min'
 
-*Example:* 
-
-== metrics_reporter_url
+=== metrics_reporter_url
 
 cluster metrics reporter url
 
@@ -4425,9 +4173,7 @@ cluster metrics reporter url
 
 *Default:* 'https://m.rp.vectorized.io/v2'
 
-*Example:* 
-
-== minimum_topic_replication
+=== minimum_topic_replication
 
 Minimum permitted value of replication factor for new topics
 
@@ -4443,25 +4189,7 @@ Minimum permitted value of replication factor for new topics
 
 *Default:* 1
 
-*Example:* 
-
-== node_id
-
-Unique id identifying a node in the cluster. If missing, a unique id will be assigned for this node when it joins the cluster
-
-*Requires Restart:* No
-
-*Nullable:* Yes
-
-*Visibility:* user
-
-*Type:* #/definitions/model::node_id
-
-*Default:* None
-
-*Example:* 
-
-== node_isolation_heartbeat_timeout
+=== node_isolation_heartbeat_timeout
 
 How long after the last heartbeat request a node will wait before considering itself to be isolated
 
@@ -4477,9 +4205,7 @@ How long after the last heartbeat request a node will wait before considering it
 
 *Default:* 3000
 
-*Example:* 
-
-== node_management_operation_timeout_ms
+=== node_management_operation_timeout_ms
 
 Timeout for executing node management operations
 
@@ -4495,9 +4221,7 @@ Timeout for executing node management operations
 
 *Default:* '5s'
 
-*Example:* 
-
-== node_status_interval
+=== node_status_interval
 
 Time interval between two node status messages. Node status messages establish liveness status outside of the Raft protocol.
 
@@ -4513,9 +4237,7 @@ Time interval between two node status messages. Node status messages establish l
 
 *Default:* '100ms'
 
-*Example:* 
-
-== node_status_reconnect_max_backoff_ms
+=== node_status_reconnect_max_backoff_ms
 
 Maximum backoff (in ms) to reconnect to an unresponsive peer during node status liveness checks.
 
@@ -4531,9 +4253,7 @@ Maximum backoff (in ms) to reconnect to an unresponsive peer during node status 
 
 *Default:* '15s'
 
-*Example:* 
-
-== oidc_clock_skew_tolerance
+=== oidc_clock_skew_tolerance
 
 The amount of seconds to allow for when validating the exp, nbf, and iat claims in the token.
 
@@ -4549,9 +4269,7 @@ The amount of seconds to allow for when validating the exp, nbf, and iat claims 
 
 *Default:* 'std::chrono::seconds{} * 30'
 
-*Example:* 
-
-== oidc_discovery_url
+=== oidc_discovery_url
 
 The URL pointing to the well-known discovery endpoint for the OIDC provider.
 
@@ -4565,9 +4283,7 @@ The URL pointing to the well-known discovery endpoint for the OIDC provider.
 
 *Default:* 'https://auth.prd.cloud.redpanda.com/.well-known/openid-configuration'
 
-*Example:* 
-
-== oidc_keys_refresh_interval
+=== oidc_keys_refresh_interval
 
 The frequency of refreshing the JSON Web Keys (JWKS) used to validate access tokens.
 
@@ -4583,9 +4299,7 @@ The frequency of refreshing the JSON Web Keys (JWKS) used to validate access tok
 
 *Default:* '1h'
 
-*Example:* 
-
-== oidc_principal_mapping
+=== oidc_principal_mapping
 
 Rule for mapping JWT Payload claim to a Redpanda User Principal
 
@@ -4599,9 +4313,7 @@ Rule for mapping JWT Payload claim to a Redpanda User Principal
 
 *Default:* '$.sub'
 
-*Example:* 
-
-== oidc_token_audience
+=== oidc_token_audience
 
 A string representing the intended recipient of the token.
 
@@ -4615,9 +4327,7 @@ A string representing the intended recipient of the token.
 
 *Default:* 'redpanda'
 
-*Example:* 
-
-== partition_autobalancing_concurrent_moves
+=== partition_autobalancing_concurrent_moves
 
 Number of partitions that can be reassigned at once
 
@@ -4631,9 +4341,7 @@ Number of partitions that can be reassigned at once
 
 *Default:* 50
 
-*Example:* 
-
-== partition_autobalancing_max_disk_usage_percent
+=== partition_autobalancing_max_disk_usage_percent
 
 Disk usage threshold that triggers moving partitions from the node
 
@@ -4649,9 +4357,7 @@ Disk usage threshold that triggers moving partitions from the node
 
 *Default:* 80
 
-*Example:* 
-
-== partition_autobalancing_min_size_threshold
+=== partition_autobalancing_min_size_threshold
 
 Minimum size of partition that is going to be prioritized when rebalancing cluster due to disk size threshold being breached. By default this value is calculated automaticaly
 
@@ -4665,9 +4371,7 @@ Minimum size of partition that is going to be prioritized when rebalancing clust
 
 *Default:* None
 
-*Example:* 
-
-== partition_autobalancing_mode
+=== partition_autobalancing_mode
 
 Partition autobalancing mode
 
@@ -4681,9 +4385,7 @@ Partition autobalancing mode
 
 *Default:* 'model::partition_autobalancing_mode::node_add'
 
-*Example:* 
-
-== partition_autobalancing_node_availability_timeout_sec
+=== partition_autobalancing_node_availability_timeout_sec
 
 Node unavailability timeout that triggers moving partitions from the node
 
@@ -4699,9 +4401,7 @@ Node unavailability timeout that triggers moving partitions from the node
 
 *Default:* '15min'
 
-*Example:* 
-
-== partition_autobalancing_tick_interval_ms
+=== partition_autobalancing_tick_interval_ms
 
 Partition autobalancer tick interval
 
@@ -4717,9 +4417,7 @@ Partition autobalancer tick interval
 
 *Default:* '30s'
 
-*Example:* 
-
-== partition_autobalancing_tick_moves_drop_threshold
+=== partition_autobalancing_tick_moves_drop_threshold
 
 If the number of scheduled tick moves drops by this ratio, a new tick is scheduled immediately. Valid values are (0, 1]. For example, with a value of 0.2 and 100 scheduled moves in a tick, a new tick is scheduled when the inprogress moves are < 80.
 
@@ -4733,9 +4431,7 @@ If the number of scheduled tick moves drops by this ratio, a new tick is schedul
 
 *Default:* 0.2
 
-*Example:* 
-
-== partition_manager_shutdown_watchdog_timeout
+=== partition_manager_shutdown_watchdog_timeout
 
 A threshold value to detect partitions which shutdown might have been stuck. After this threshold a watchdog in partition manager will log information about partition shutdown not making progress
 
@@ -4751,9 +4447,7 @@ A threshold value to detect partitions which shutdown might have been stuck. Aft
 
 *Default:* '30s'
 
-*Example:* 
-
-== pp_sr_smp_max_non_local_requests
+=== pp_sr_smp_max_non_local_requests
 
 Maximum number of x-core requests pending in Panda Proxy and Schema Registry seastar::smp group.  (for more details look at `seastar::smp_service_group` documentation)
 
@@ -4769,9 +4463,7 @@ Maximum number of x-core requests pending in Panda Proxy and Schema Registry sea
 
 *Default:* None
 
-*Example:* 
-
-== quota_manager_gc_sec
+=== quota_manager_gc_sec
 
 Quota manager GC frequency in milliseconds
 
@@ -4787,25 +4479,7 @@ Quota manager GC frequency in milliseconds
 
 *Default:* 'std::chrono::milliseconds(30000)'
 
-*Example:* 
-
-== rack
-
-Rack identifier
-
-*Requires Restart:* No
-
-*Nullable:* Yes
-
-*Visibility:* user
-
-*Type:* #/definitions/model::rack_id
-
-*Default:* None
-
-*Example:* 
-
-== raft_election_timeout_ms
+=== raft_election_timeout_ms
 
 Election timeout expressed in milliseconds
 
@@ -4821,9 +4495,7 @@ Election timeout expressed in milliseconds
 
 *Default:* "1'500ms"
 
-*Example:* 
-
-== raft_enable_lw_heartbeat
+=== raft_enable_lw_heartbeat
 
 enables raft optimization of heartbeats
 
@@ -4837,9 +4509,7 @@ enables raft optimization of heartbeats
 
 *Default:* True
 
-*Example:* 
-
-== raft_flush_timer_interval_ms
+=== raft_flush_timer_interval_ms
 
 Interval of checking partition against the `raft_replica_max_pending_flush_bytes`
 
@@ -4855,9 +4525,7 @@ Interval of checking partition against the `raft_replica_max_pending_flush_bytes
 
 *Default:* '100ms'
 
-*Example:* 
-
-== raft_heartbeat_disconnect_failures
+=== raft_heartbeat_disconnect_failures
 
 After how many failed heartbeats to forcibly close an unresponsive TCP connection.  Set to 0 to disable force disconnection.
 
@@ -4871,9 +4539,7 @@ After how many failed heartbeats to forcibly close an unresponsive TCP connectio
 
 *Default:* 3
 
-*Example:* 
-
-== raft_heartbeat_interval_ms
+=== raft_heartbeat_interval_ms
 
 Milliseconds for raft leader heartbeats
 
@@ -4889,9 +4555,7 @@ Milliseconds for raft leader heartbeats
 
 *Default:* 'std::chrono::milliseconds(150)'
 
-*Example:* 
-
-== raft_heartbeat_timeout_ms
+=== raft_heartbeat_timeout_ms
 
 raft heartbeat RPC timeout
 
@@ -4907,9 +4571,7 @@ raft heartbeat RPC timeout
 
 *Default:* '3s'
 
-*Example:* 
-
-== raft_io_timeout_ms
+=== raft_io_timeout_ms
 
 Raft I/O timeout
 
@@ -4925,9 +4587,7 @@ Raft I/O timeout
 
 *Default:* "10'000ms"
 
-*Example:* 
-
-== raft_learner_recovery_rate
+=== raft_learner_recovery_rate
 
 Raft learner recovery rate limit in bytes per sec
 
@@ -4941,9 +4601,7 @@ Raft learner recovery rate limit in bytes per sec
 
 *Default:* 104857600
 
-*Example:* 
-
-== raft_max_concurrent_append_requests_per_follower
+=== raft_max_concurrent_append_requests_per_follower
 
 Maximum number of concurrent append entries requests sent by leader to one follower
 
@@ -4959,9 +4617,7 @@ Maximum number of concurrent append entries requests sent by leader to one follo
 
 *Default:* 16
 
-*Example:* 
-
-== raft_max_recovery_memory
+=== raft_max_recovery_memory
 
 Max memory that can be used for reads in raft recovery process by default 15% of total memory
 
@@ -4975,9 +4631,7 @@ Max memory that can be used for reads in raft recovery process by default 15% of
 
 *Default:* None
 
-*Example:* 
-
-== raft_recovery_concurrency_per_shard
+=== raft_recovery_concurrency_per_shard
 
 How many partitions may simultaneously recover data to a particular shard. This is limited to avoid overwhelming nodes when they come back online after an outage.
 
@@ -4991,9 +4645,7 @@ How many partitions may simultaneously recover data to a particular shard. This 
 
 *Default:* 64
 
-*Example:* 
-
-== raft_recovery_default_read_size
+=== raft_recovery_default_read_size
 
 default size of read issued during raft follower recovery
 
@@ -5007,9 +4659,7 @@ default size of read issued during raft follower recovery
 
 *Default:* 524288
 
-*Example:* 
-
-== raft_recovery_throttle_disable_dynamic_mode
+=== raft_recovery_throttle_disable_dynamic_mode
 
 Disables dynamic rate allocation in recovery throttle (advanced).
 
@@ -5023,9 +4673,7 @@ Disables dynamic rate allocation in recovery throttle (advanced).
 
 *Default:* False
 
-*Example:* 
-
-== raft_replica_max_pending_flush_bytes
+=== raft_replica_max_pending_flush_bytes
 
 Max not flushed bytes per partition. If configured threshold is reached log will automatically be flushed even though it wasn't explicitly requested
 
@@ -5039,9 +4687,7 @@ Max not flushed bytes per partition. If configured threshold is reached log will
 
 *Default:* 262144
 
-*Example:* 
-
-== raft_replicate_batch_window_size
+=== raft_replicate_batch_window_size
 
 Max size of requests cached for replication
 
@@ -5055,9 +4701,7 @@ Max size of requests cached for replication
 
 *Default:* 1048576
 
-*Example:* 
-
-== raft_smp_max_non_local_requests
+=== raft_smp_max_non_local_requests
 
 Maximum number of x-core requests pending in Raft seastar::smp group. (for more details look at `seastar::smp_service_group` documentation)
 
@@ -5073,9 +4717,7 @@ Maximum number of x-core requests pending in Raft seastar::smp group. (for more 
 
 *Default:* None
 
-*Example:* 
-
-== raft_timeout_now_timeout_ms
+=== raft_timeout_now_timeout_ms
 
 Timeout for a timeout now request
 
@@ -5091,9 +4733,7 @@ Timeout for a timeout now request
 
 *Default:* '1s'
 
-*Example:* 
-
-== raft_transfer_leader_recovery_timeout_ms
+=== raft_transfer_leader_recovery_timeout_ms
 
 Timeout waiting for follower recovery when transferring leadership
 
@@ -5109,9 +4749,7 @@ Timeout waiting for follower recovery when transferring leadership
 
 *Default:* '10s'
 
-*Example:* 
-
-== readers_cache_eviction_timeout_ms
+=== readers_cache_eviction_timeout_ms
 
 Duration after which inactive readers will be evicted from cache
 
@@ -5127,9 +4765,7 @@ Duration after which inactive readers will be evicted from cache
 
 *Default:* '30s'
 
-*Example:* 
-
-== reclaim_batch_cache_min_free
+=== reclaim_batch_cache_min_free
 
 Free memory limit that will be kept by batch cache background reclaimer
 
@@ -5143,9 +4779,7 @@ Free memory limit that will be kept by batch cache background reclaimer
 
 *Default:* 67108864
 
-*Example:* 
-
-== reclaim_growth_window
+=== reclaim_growth_window
 
 Length of time in which reclaim sizes grow
 
@@ -5161,9 +4795,7 @@ Length of time in which reclaim sizes grow
 
 *Default:* "3'000ms"
 
-*Example:* 
-
-== reclaim_max_size
+=== reclaim_max_size
 
 Maximum batch cache reclaim size
 
@@ -5177,9 +4809,7 @@ Maximum batch cache reclaim size
 
 *Default:* 4194304
 
-*Example:* 
-
-== reclaim_min_size
+=== reclaim_min_size
 
 Minimum batch cache reclaim size
 
@@ -5193,9 +4823,7 @@ Minimum batch cache reclaim size
 
 *Default:* 131072
 
-*Example:* 
-
-== reclaim_stable_window
+=== reclaim_stable_window
 
 Length of time above which growth is reset
 
@@ -5211,9 +4839,7 @@ Length of time above which growth is reset
 
 *Default:* "10'000ms"
 
-*Example:* 
-
-== recovery_append_timeout_ms
+=== recovery_append_timeout_ms
 
 Timeout for append entries requests issued while updating stale follower
 
@@ -5229,25 +4855,7 @@ Timeout for append entries requests issued while updating stale follower
 
 *Default:* '5s'
 
-*Example:* 
-
-== recovery_mode_enabled
-
-If true, start redpanda in "metadata only" mode, skipping loading user partitions and allowing only metadata operations.
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* user
-
-*Type:* boolean
-
-*Default:* False
-
-*Example:* 
-
-== release_cache_on_segment_roll
+=== release_cache_on_segment_roll
 
 Free cache when segments roll
 
@@ -5261,9 +4869,7 @@ Free cache when segments roll
 
 *Default:* False
 
-*Example:* 
-
-== replicate_append_timeout_ms
+=== replicate_append_timeout_ms
 
 Timeout for append entries requests issued while replicating entries
 
@@ -5279,9 +4885,7 @@ Timeout for append entries requests issued while replicating entries
 
 *Default:* '3s'
 
-*Example:* 
-
-== retention_bytes
+=== retention_bytes
 
 Default max bytes per partition on disk before triggering a compaction
 
@@ -5295,9 +4899,7 @@ Default max bytes per partition on disk before triggering a compaction
 
 *Default:* None
 
-*Example:* 
-
-== retention_local_strict
+=== retention_local_strict
 
 Trim log data when a cloud topic reaches its local retention limit. When this option is disabled Redpanda will allow partitions to grow past the local retention limit, and will be trimmed automatically as storage reaches the configured target size.
 
@@ -5311,9 +4913,7 @@ Trim log data when a cloud topic reaches its local retention limit. When this op
 
 *Default:* False
 
-*Example:* 
-
-== retention_local_strict_override
+=== retention_local_strict_override
 
 Trim log data when a cloud topic reaches its local retention limit. When this option is disabled Redpanda will allow partitions to grow past the local retention limit, and will be trimmed automatically as storage reaches the configured target size.
 
@@ -5327,9 +4927,7 @@ Trim log data when a cloud topic reaches its local retention limit. When this op
 
 *Default:* True
 
-*Example:* 
-
-== retention_local_target_bytes_default
+=== retention_local_target_bytes_default
 
 Local retention size target for partitions of topics with cloud storage write enabled
 
@@ -5343,9 +4941,7 @@ Local retention size target for partitions of topics with cloud storage write en
 
 *Default:* None
 
-*Example:* 
-
-== retention_local_target_capacity_bytes
+=== retention_local_target_capacity_bytes
 
 The target capacity in bytes that log storage will try to use before additional retention rules will take over to trim data in order to meet the target. When no target is specified storage usage is unbounded.
 
@@ -5361,9 +4957,7 @@ The target capacity in bytes that log storage will try to use before additional 
 
 *Default:* None
 
-*Example:* 
-
-== retention_local_target_capacity_percent
+=== retention_local_target_capacity_percent
 
 The target capacity in percent of unreserved space (see disk_reservation_percent) that log storage will try to use before additional retention rules will take over to trim data in order to meet the target. When no target is specified storage usage is unbounded.
 
@@ -5377,9 +4971,7 @@ The target capacity in percent of unreserved space (see disk_reservation_percent
 
 *Default:* 80.0
 
-*Example:* 
-
-== retention_local_target_ms_default
+=== retention_local_target_ms_default
 
 Local retention time target for partitions of topics with cloud storage write enabled
 
@@ -5395,9 +4987,7 @@ Local retention time target for partitions of topics with cloud storage write en
 
 *Default:* '24h'
 
-*Example:* 
-
-== retention_local_trim_interval
+=== retention_local_trim_interval
 
 The maximum amount of time before log storage will examine usage to determine of the target capacity has been exceeded and additional data trimming is required.
 
@@ -5413,9 +5003,7 @@ The maximum amount of time before log storage will examine usage to determine of
 
 *Default:* '30s'
 
-*Example:* 
-
-== retention_local_trim_overage_coeff
+=== retention_local_trim_overage_coeff
 
 The space management control loop will reclaim the overage multiplied by this this coefficient in order to compensate for data that is written during the idle period between control loop invocations.
 
@@ -5429,9 +5017,7 @@ The space management control loop will reclaim the overage multiplied by this th
 
 *Default:* 2.0
 
-*Example:* 
-
-== rm_sync_timeout_ms
+=== rm_sync_timeout_ms
 
 Time to wait state catch up before rejecting a request
 
@@ -5447,25 +5033,23 @@ Time to wait state catch up before rejecting a request
 
 *Default:* '10s'
 
-*Example:* 
+=== rpc_client_connections_per_peer
 
-== rpc_server
-
-IpAddress and port for RPC server
+The maximum number of connections a broker will open to each of its peers
 
 *Requires Restart:* No
 
 *Nullable:* No
 
-*Visibility:* user
+*Visibility:* None
 
-*Type:* #/definitions/net::unresolved_address
+*Type:* integer
 
-*Default:* 'net::unresolved_address("127.0.0.1", 33145)'
+*Accepted values:* [-2147483648, 2147483647]
 
-*Example:* 
+*Default:* 32
 
-== rpc_server_compress_replies
+=== rpc_server_compress_replies
 
 Enable compression for internal rpc server replies
 
@@ -5479,9 +5063,7 @@ Enable compression for internal rpc server replies
 
 *Default:* False
 
-*Example:* 
-
-== rpc_server_listen_backlog
+=== rpc_server_listen_backlog
 
 TCP connection queue length for Kafka server and internal RPC server
 
@@ -5497,25 +5079,39 @@ TCP connection queue length for Kafka server and internal RPC server
 
 *Default:* None
 
-*Example:* 
+=== rpc_server_tcp_recv_buf
 
-== rpc_server_tls
-
-TLS configuration for RPC server
+Internal RPC TCP receive buffer size in bytes.
 
 *Requires Restart:* No
 
-*Nullable:* No
+*Nullable:* Yes
 
-*Visibility:* user
+*Visibility:* None
 
-*Type:* #/definitions/tls_config
+*Type:* integer
 
-*Default:* 'tls_config()'
+*Accepted values:* [-2147483648, 2147483647]
 
-*Example:* 
+*Default:* None
 
-== rps_limit_acls_and_users_operations
+=== rpc_server_tcp_send_buf
+
+Internal RPC TCP transmit buffer size in bytes.
+
+*Requires Restart:* No
+
+*Nullable:* Yes
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-2147483648, 2147483647]
+
+*Default:* None
+
+=== rps_limit_acls_and_users_operations
 
 Rate limit for controller acls and users operations
 
@@ -5529,9 +5125,7 @@ Rate limit for controller acls and users operations
 
 *Default:* 1000
 
-*Example:* 
-
-== rps_limit_configuration_operations
+=== rps_limit_configuration_operations
 
 Rate limit for controller configuration operations
 
@@ -5545,9 +5139,7 @@ Rate limit for controller configuration operations
 
 *Default:* 1000
 
-*Example:* 
-
-== rps_limit_move_operations
+=== rps_limit_move_operations
 
 Rate limit for controller move operations
 
@@ -5561,9 +5153,7 @@ Rate limit for controller move operations
 
 *Default:* 1000
 
-*Example:* 
-
-== rps_limit_node_management_operations
+=== rps_limit_node_management_operations
 
 Rate limit for controller node management operations
 
@@ -5577,9 +5167,7 @@ Rate limit for controller node management operations
 
 *Default:* 1000
 
-*Example:* 
-
-== rps_limit_topic_operations
+=== rps_limit_topic_operations
 
 Rate limit for controller topic operations
 
@@ -5593,9 +5181,7 @@ Rate limit for controller topic operations
 
 *Default:* 1000
 
-*Example:* 
-
-== sampled_memory_profile
+=== sampled_memory_profile
 
 If true, memory allocations will be sampled and tracked. A sampled live set of allocations can then be retrieved from the Admin API. Additionally, we will periodically log the top-n allocation sites
 
@@ -5609,9 +5195,7 @@ If true, memory allocations will be sampled and tracked. A sampled live set of a
 
 *Default:* True
 
-*Example:* 
-
-== sasl_kerberos_config
+=== sasl_kerberos_config
 
 The location of the Kerberos krb5.conf file for Redpanda
 
@@ -5625,9 +5209,7 @@ The location of the Kerberos krb5.conf file for Redpanda
 
 *Default:* '/etc/krb5.conf'
 
-*Example:* 
-
-== sasl_kerberos_keytab
+=== sasl_kerberos_keytab
 
 The location of the Kerberos keytab file for Redpanda
 
@@ -5641,9 +5223,7 @@ The location of the Kerberos keytab file for Redpanda
 
 *Default:* '/var/lib/redpanda/redpanda.keytab'
 
-*Example:* 
-
-== sasl_kerberos_principal
+=== sasl_kerberos_principal
 
 The primary of the Kerberos Service Principal Name (SPN) for Redpanda
 
@@ -5657,9 +5237,7 @@ The primary of the Kerberos Service Principal Name (SPN) for Redpanda
 
 *Default:* 'redpanda'
 
-*Example:* 
-
-== sasl_kerberos_principal_mapping
+=== sasl_kerberos_principal_mapping
 
 Rules for mapping Kerberos Principal Names to Redpanda User Principals
 
@@ -5673,9 +5251,7 @@ Rules for mapping Kerberos Principal Names to Redpanda User Principals
 
 *Default:* ['DEFAULT']
 
-*Example:* 
-
-== sasl_mechanisms
+=== sasl_mechanisms
 
 A list of supported SASL mechanisms. `SCRAM`, `GSSAPI`, and `OAUTHBEARER` are allowed.
 
@@ -5689,25 +5265,7 @@ A list of supported SASL mechanisms. `SCRAM`, `GSSAPI`, and `OAUTHBEARER` are al
 
 *Default:* ['SCRAM']
 
-*Example:* 
-
-== seed_servers
-
-List of the seed servers used to join current cluster. If the seed_server list is empty the node will be a cluster root and it will form a new cluster
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* user
-
-*Type:* array
-
-*Default:* None
-
-*Example:* 
-
-== segment_appender_flush_timeout_ms
+=== segment_appender_flush_timeout_ms
 
 Maximum delay until buffered data is written
 
@@ -5723,9 +5281,7 @@ Maximum delay until buffered data is written
 
 *Default:* 'std::chrono::milliseconds(1s)'
 
-*Example:* 
-
-== segment_fallocation_step
+=== segment_fallocation_step
 
 Size for segments fallocation
 
@@ -5739,9 +5295,7 @@ Size for segments fallocation
 
 *Default:* 33554432
 
-*Example:* 
-
-== space_management_enable
+=== space_management_enable
 
 Enable automatic space management.
 
@@ -5755,9 +5309,7 @@ Enable automatic space management.
 
 *Default:* True
 
-*Example:* 
-
-== space_management_enable_override
+=== space_management_enable_override
 
 Enable automatic space management. This option is ignored and deprecated in versions >= v23.3.
 
@@ -5771,9 +5323,7 @@ Enable automatic space management. This option is ignored and deprecated in vers
 
 *Default:* False
 
-*Example:* 
-
-== space_management_max_log_concurrency
+=== space_management_max_log_concurrency
 
 Maximum parallel logs inspected during space management process.
 
@@ -5789,9 +5339,7 @@ Maximum parallel logs inspected during space management process.
 
 *Default:* 20
 
-*Example:* 
-
-== space_management_max_segment_concurrency
+=== space_management_max_segment_concurrency
 
 Maximum parallel segments inspected during space management process.
 
@@ -5807,9 +5355,7 @@ Maximum parallel segments inspected during space management process.
 
 *Default:* 10
 
-*Example:* 
-
-== storage_compaction_index_memory
+=== storage_compaction_index_memory
 
 Maximum number of bytes that may be used on each shard by compactionindex writers
 
@@ -5825,9 +5371,7 @@ Maximum number of bytes that may be used on each shard by compactionindex writer
 
 *Default:* 134217728
 
-*Example:* 
-
-== storage_compaction_key_map_memory
+=== storage_compaction_key_map_memory
 
 Maximum number of bytes that may be used on each shard by compaction key-offset maps. Only respected when `log_compaction_use_sliding_window` is true.
 
@@ -5843,9 +5387,7 @@ Maximum number of bytes that may be used on each shard by compaction key-offset 
 
 *Default:* 134217728
 
-*Example:* 
-
-== storage_compaction_key_map_memory_limit_percent
+=== storage_compaction_key_map_memory_limit_percent
 
 Limit on `storage_compaction_key_map_memory`, expressed as a percentage of memory per shard, that bounds the amount of memory used by compaction key-offset maps. NOTE: Memory per shard is computed after `wasm_per_core_memory_reservation`. Only respected when `log_compaction_use_sliding_window` is true.
 
@@ -5859,41 +5401,7 @@ Limit on `storage_compaction_key_map_memory`, expressed as a percentage of memor
 
 *Default:* 12.0
 
-*Example:* 
-
-== storage_failure_injection_config_path
-
-Path to the configuration file used for low level storage failure injection
-
-*Requires Restart:* No
-
-*Nullable:* Yes
-
-*Visibility:* tunable
-
-*Type:* string
-
-*Default:* None
-
-*Example:* 
-
-== storage_failure_injection_enabled
-
-If true, inject low level storage failures on the write path. **Not** for production usage.
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* tunable
-
-*Type:* boolean
-
-*Default:* False
-
-*Example:* 
-
-== storage_ignore_cstore_hints
+=== storage_ignore_cstore_hints
 
 if set, cstore hints will be ignored and will not be used for data access (but will otherwise be generated)
 
@@ -5907,9 +5415,7 @@ if set, cstore hints will be ignored and will not be used for data access (but w
 
 *Default:* False
 
-*Example:* 
-
-== storage_ignore_timestamps_in_future_sec
+=== storage_ignore_timestamps_in_future_sec
 
 If set, timestamps more than this many seconds in the future relative tothe server's clock will be ignored for data retention purposes, and retention will act based on another timestamp in the same segment, or the mtime of the segment file if no valid timestamp is available
 
@@ -5925,9 +5431,7 @@ If set, timestamps more than this many seconds in the future relative tothe serv
 
 *Default:* None
 
-*Example:* 
-
-== storage_max_concurrent_replay
+=== storage_max_concurrent_replay
 
 Maximum number of partitions' logs that will be replayed concurrently at startup, or flushed concurrently on shutdown.
 
@@ -5943,9 +5447,7 @@ Maximum number of partitions' logs that will be replayed concurrently at startup
 
 *Default:* 1024
 
-*Example:* 
-
-== storage_min_free_bytes
+=== storage_min_free_bytes
 
 Threshold of minimum bytes free space before rejecting producers.
 
@@ -5959,9 +5461,7 @@ Threshold of minimum bytes free space before rejecting producers.
 
 *Default:* 5368709120
 
-*Example:* 
-
-== storage_read_buffer_size
+=== storage_read_buffer_size
 
 Size of each read buffer (one per in-flight read, per log segment)
 
@@ -5975,9 +5475,7 @@ Size of each read buffer (one per in-flight read, per log segment)
 
 *Default:* 131072
 
-*Example:* 
-
-== storage_read_readahead_count
+=== storage_read_readahead_count
 
 How many additional reads to issue ahead of current read location
 
@@ -5993,9 +5491,7 @@ How many additional reads to issue ahead of current read location
 
 *Default:* 10
 
-*Example:* 
-
-== storage_reserve_min_segments
+=== storage_reserve_min_segments
 
 The number of segments per partition that the system will attempt to reserve disk capacity for. For example, if the maximum segment size is configured to be 100 MB, and the value of this option is 2, then in a system with 10 partitions Redpanda will attempt to reserve at least 2 GB of disk space.
 
@@ -6011,9 +5507,7 @@ The number of segments per partition that the system will attempt to reserve dis
 
 *Default:* 2
 
-*Example:* 
-
-== storage_space_alert_free_threshold_bytes
+=== storage_space_alert_free_threshold_bytes
 
 Threshold of minimum bytes free space before setting storage space alert
 
@@ -6027,9 +5521,7 @@ Threshold of minimum bytes free space before setting storage space alert
 
 *Default:* 0
 
-*Example:* 
-
-== storage_space_alert_free_threshold_percent
+=== storage_space_alert_free_threshold_percent
 
 Threshold of minimum percent free space before setting storage space alert
 
@@ -6045,9 +5537,7 @@ Threshold of minimum percent free space before setting storage space alert
 
 *Default:* 5
 
-*Example:* 
-
-== storage_strict_data_init
+=== storage_strict_data_init
 
 Requires that an empty file named `.redpanda_data_dir` be present in the data directory. Redpanda will refuse to start if it is not found.
 
@@ -6061,9 +5551,7 @@ Requires that an empty file named `.redpanda_data_dir` be present in the data di
 
 *Default:* False
 
-*Example:* 
-
-== storage_target_replay_bytes
+=== storage_target_replay_bytes
 
 Target bytes to replay from disk on startup after clean shutdown: controls frequency of snapshots and checkpoints
 
@@ -6079,9 +5567,7 @@ Target bytes to replay from disk on startup after clean shutdown: controls frequ
 
 *Default:* 10737418240
 
-*Example:* 
-
-== superusers
+=== superusers
 
 List of superuser usernames
 
@@ -6095,9 +5581,7 @@ List of superuser usernames
 
 *Default:* None
 
-*Example:* 
-
-== target_fetch_quota_byte_rate
+=== target_fetch_quota_byte_rate
 
 Target fetch size quota byte rate (bytes per second) - disabled default
 
@@ -6113,9 +5597,7 @@ Target fetch size quota byte rate (bytes per second) - disabled default
 
 *Default:* None
 
-*Example:* 
-
-== target_quota_byte_rate
+=== target_quota_byte_rate
 
 Target request size quota byte rate (bytes per second) - 2GB default
 
@@ -6131,9 +5613,7 @@ Target request size quota byte rate (bytes per second) - 2GB default
 
 *Default:* 2147483648
 
-*Example:* 
-
-== tm_sync_timeout_ms
+=== tm_sync_timeout_ms
 
 Time to wait state catch up before rejecting a request
 
@@ -6149,9 +5629,7 @@ Time to wait state catch up before rejecting a request
 
 *Default:* '10s'
 
-*Example:* 
-
-== topic_fds_per_partition
+=== topic_fds_per_partition
 
 Required file handles per partition when creating topics
 
@@ -6167,9 +5645,7 @@ Required file handles per partition when creating topics
 
 *Default:* 5
 
-*Example:* 
-
-== topic_memory_per_partition
+=== topic_memory_per_partition
 
 Required memory per partition when creating topics
 
@@ -6183,9 +5659,7 @@ Required memory per partition when creating topics
 
 *Default:* 4194304
 
-*Example:* 
-
-== topic_partitions_per_shard
+=== topic_partitions_per_shard
 
 Maximum number of partitions which may be allocated to one shard (CPU core)
 
@@ -6201,9 +5675,7 @@ Maximum number of partitions which may be allocated to one shard (CPU core)
 
 *Default:* 1000
 
-*Example:* 
-
-== topic_partitions_reserve_shard0
+=== topic_partitions_reserve_shard0
 
 Reserved partition slots on shard (CPU core) 0 on each node.  If this is >= topic_partitions_per_core, no data partitions will be scheduled on shard 0
 
@@ -6219,9 +5691,7 @@ Reserved partition slots on shard (CPU core) 0 on each node.  If this is >= topi
 
 *Default:* 2
 
-*Example:* 
-
-== transaction_coordinator_cleanup_policy
+=== transaction_coordinator_cleanup_policy
 
 Cleanup policy for a transaction coordinator topic
 
@@ -6235,9 +5705,7 @@ Cleanup policy for a transaction coordinator topic
 
 *Default:* 'model::cleanup_policy_bitflags::deletion'
 
-*Example:* 
-
-== transaction_coordinator_delete_retention_ms
+=== transaction_coordinator_delete_retention_ms
 
 delete segments older than this - default 1 week
 
@@ -6253,9 +5721,7 @@ delete segments older than this - default 1 week
 
 *Default:* '10080min'
 
-*Example:* 
-
-== transaction_coordinator_log_segment_size
+=== transaction_coordinator_log_segment_size
 
 How large in bytes should each log segment be (default 1G)
 
@@ -6271,9 +5737,7 @@ How large in bytes should each log segment be (default 1G)
 
 *Default:* 1073741824
 
-*Example:* 
-
-== transaction_coordinator_partitions
+=== transaction_coordinator_partitions
 
 Amount of partitions for transactions coordinator
 
@@ -6289,9 +5753,7 @@ Amount of partitions for transactions coordinator
 
 *Default:* 50
 
-*Example:* 
-
-== transactional_id_expiration_ms
+=== transactional_id_expiration_ms
 
 Producer ids are expired once this time has elapsed after the last write with the given producer id.
 
@@ -6307,9 +5769,7 @@ Producer ids are expired once this time has elapsed after the last write with th
 
 *Default:* '10080min'
 
-*Example:* 
-
-== tx_log_stats_interval_s
+=== tx_log_stats_interval_s
 
 How often to log per partition tx stats, works only with debug logging enabled.
 
@@ -6325,9 +5785,7 @@ How often to log per partition tx stats, works only with debug logging enabled.
 
 *Default:* '10s'
 
-*Example:* 
-
-== tx_timeout_delay_ms
+=== tx_timeout_delay_ms
 
 Delay before scheduling next check for timed out transactions
 
@@ -6343,25 +5801,7 @@ Delay before scheduling next check for timed out transactions
 
 *Default:* '1000ms'
 
-*Example:* 
-
-== upgrade_override_checks
-
-Whether to violate safety checks when starting a redpanda version newer than the cluster's consensus version
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* tunable
-
-*Type:* boolean
-
-*Default:* False
-
-*Example:* 
-
-== usage_disk_persistance_interval_sec
+=== usage_disk_persistance_interval_sec
 
 The interval in which all usage stats are written to disk
 
@@ -6377,9 +5817,7 @@ The interval in which all usage stats are written to disk
 
 *Default:* 'std::chrono::seconds(60 * 5)'
 
-*Example:* 
-
-== usage_num_windows
+=== usage_num_windows
 
 The number of windows to persist in memory and disk
 
@@ -6393,9 +5831,7 @@ The number of windows to persist in memory and disk
 
 *Default:* 24
 
-*Example:* 
-
-== usage_window_width_interval_sec
+=== usage_window_width_interval_sec
 
 The width of a usage window, tracking cloud and kafka ingress/egress traffic each interval
 
@@ -6411,9 +5847,7 @@ The width of a usage window, tracking cloud and kafka ingress/egress traffic eac
 
 *Default:* 'std::chrono::seconds(3600)'
 
-*Example:* 
-
-== use_fetch_scheduler_group
+=== use_fetch_scheduler_group
 
 Use a separate scheduler group for fetch processing
 
@@ -6427,27 +5861,7 @@ Use a separate scheduler group for fetch processing
 
 *Default:* True
 
-*Example:* 
-
-== verbose_logging_timeout_sec_max
-
-Maximum duration in seconds for verbose (i.e. TRACE or DEBUG) logging. Values configured above this will be clamped. If null (the default) there is no limit. Can be overridded in the Admin API on a per-request basis.
-
-*Requires Restart:* No
-
-*Nullable:* Yes
-
-*Visibility:* tunable
-
-*Type:* integer
-
-*Accepted values:* [-17179869184, 17179869183]
-
-*Default:* None
-
-*Example:* 
-
-== wait_for_leader_timeout_ms
+=== wait_for_leader_timeout_ms
 
 Timeout (ms) to wait for leadership in metadata cache
 
@@ -6463,9 +5877,7 @@ Timeout (ms) to wait for leadership in metadata cache
 
 *Default:* "5'000ms"
 
-*Example:* 
-
-== zstd_decompress_workspace_bytes
+=== zstd_decompress_workspace_bytes
 
 Size of the zstd decompression workspace
 
@@ -6479,5 +5891,471 @@ Size of the zstd decompression workspace
 
 *Default:* 8388608
 
-*Example:* 
+
+
+== Kafka Client
+
+Kafka Client intro
+
+=== broker_tls
+
+TLS configuration for the brokers
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* #/definitions/config::tls_config
+
+*Default:* 'config::tls_config()'
+
+=== brokers
+
+List of address and port of the brokers
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* array
+
+*Default:* 'std::vector<net::unresolved_address>({{"127.0.0.1", 9092}})'
+
+=== client_identifier
+
+Identifier to use within the kafka request header
+
+*Requires Restart:* No
+
+*Nullable:* Yes
+
+*Visibility:* None
+
+*Type:* string
+
+*Default:* 'test_client'
+
+=== consumer_heartbeat_interval
+
+Interval (in milliseconds) for consumer heartbeats
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '500ms'
+
+=== consumer_rebalance_timeout
+
+Timeout (in milliseconds) for consumer rebalance
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '2s'
+
+=== consumer_request_max_bytes
+
+Max bytes to fetch per request
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-2147483648, 2147483647]
+
+*Default:* 1048576
+
+=== consumer_request_min_bytes
+
+Min bytes to fetch per request
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-2147483648, 2147483647]
+
+*Default:* 1
+
+=== consumer_request_timeout
+
+Interval (in milliseconds) for consumer request timeout
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '100ms'
+
+=== consumer_session_timeout
+
+Timeout (in milliseconds) for consumer session
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '10s'
+
+=== produce_ack_level
+
+Number of acknowledgments the producer requires the leader to have received before considering a request complete, choices are 0, 1 and -1
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-32768, 32767]
+
+*Default:* -1
+
+=== produce_batch_delay
+
+Delay (in milliseconds) to wait before sending batch
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '100ms'
+
+=== produce_batch_record_count
+
+Number of records to batch before sending to broker
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-2147483648, 2147483647]
+
+*Default:* 1000
+
+=== produce_batch_size_bytes
+
+Number of bytes to batch before sending to broker
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-2147483648, 2147483647]
+
+*Default:* 1048576
+
+=== produce_compression_type
+
+Enable or disable compression by the kafka client. Specify 'none' to disable compression or one of the supported types [gzip, snappy, lz4, zstd]
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* string
+
+*Default:* 'none'
+
+=== produce_shutdown_delay
+
+Delay (in milliseconds) to allow for final flush of buffers before shutting down
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '0ms'
+
+=== retries
+
+Number of times to retry a request to a broker
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Default:* 5
+
+=== retry_base_backoff
+
+Delay (in milliseconds) for initial retry backoff
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '100ms'
+
+=== sasl_mechanism
+
+The SASL mechanism to use when connecting
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* string
+
+*Default:* ''
+
+=== scram_password
+
+Password to use for SCRAM authentication mechanisms
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* string
+
+*Default:* ''
+
+=== scram_username
+
+Username to use for SCRAM authentication mechanisms
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* string
+
+*Default:* ''
+
+
+
+== HTTP Proxy
+
+HTTP Proxy intro
+
+=== advertised_pandaproxy_api
+
+Rest API address and port to publish to client
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* #/definitions/model::broker_endpoint
+
+*Default:* None
+
+=== api_doc_dir
+
+API doc directory
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* string
+
+*Default:* '/usr/share/redpanda/proxy-api-doc'
+
+=== client_cache_max_size
+
+The maximum number of kafka clients in the LRU cache
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Default:* 10
+
+=== client_keep_alive
+
+Time in milliseconds that an idle connection may remain open
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* '5min'
+
+=== consumer_instance_timeout
+
+How long to wait for an idle consumer before removing it
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-17592186044416, 17592186044415]
+
+*Default:* 'std::chrono::minutes{5}'
+
+=== pandaproxy_api
+
+Rest API listen address and port
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* #/definitions/config::rest_authn_endpoint
+
+*Default:* {'address': 'net::unresolved_address("0.0.0.0", 8082)', 'authn_method': 'std::nullopt'}
+
+=== pandaproxy_api_tls
+
+TLS configuration for Pandaproxy api
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* #/definitions/config::endpoint_tls_config
+
+*Default:* None
+
+
+
+== Schema Registry
+
+Schema Registry intro
+
+=== schema_registry_api
+
+Schema Registry API listen address and port
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* #/definitions/config::rest_authn_endpoint
+
+*Default:* {'address': 'net::unresolved_address("0.0.0.0", 8081)', 'authn_method': 'std::nullopt'}
+
+=== schema_registry_api_tls
+
+TLS configuration for Schema Registry API
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* None
+
+*Type:* #/definitions/config::endpoint_tls_config
+
+*Default:* None
+
+=== schema_registry_replication_factor
+
+Replication factor for internal _schemas topic.  If unset, defaults to `default_topic_replication`
+
+*Requires Restart:* No
+
+*Nullable:* Yes
+
+*Visibility:* None
+
+*Type:* integer
+
+*Accepted values:* [-32768, 32767]
+
+*Default:* None
 

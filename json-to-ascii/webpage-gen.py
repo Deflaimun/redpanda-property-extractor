@@ -26,11 +26,28 @@ empty_visibility = ""
 max_without_min = ""
 min_without_max = ""
 
-intro = "= Broker Configuration Properties \n:description: Broker configuration properties list. \n\nBroker configuration properties are applied individually to each broker in a cluster. \n\nIMPORTANT: After you change a broker-level property setting, you must restart the broker for the change to take effect. \n\nTo learn how to set these properties from studying a sample configuration file, see the xref:./node-configuration-sample.adoc[broker configuration sample].\n\n---\n\n"
+intro = "= Redpanda Configuration Properties \n:description: Redpanda configuration properties. \n\n"
+broker_title = "== Broker\n\n"
+schema_registry_title = "== Schema Registry\n\n"
+pandaproxy_title = "== HTTP Proxy\n\n" 
+kafka_client_title = "== Kafka Client\n\n"
+cluster_config_title = "== Cluster Configuration\n\n"
+
+broker_intro = "Broker configuration properties are applied individually to each broker in a cluster. \n\nIMPORTANT: After you change a broker-level property setting, you must restart the broker for the change to take effect. \n\n"
+schema_registry_intro = "Schema Registry intro\n\n"
+pandaproxy_intro = "HTTP Proxy intro\n\n" 
+kafka_client_intro = "Kafka Client intro\n\n"
+cluster_config_intro = "Cluster Configuration intro\n\n"
+
+broker_properties = broker_title+broker_intro
+schema_registry_properties = schema_registry_title + schema_registry_intro
+pandaproxy_properties = pandaproxy_title + pandaproxy_intro
+kafka_client_properties = kafka_client_title + kafka_client_intro
+cluster_config_properties = cluster_config_title + cluster_config_intro
+
+
 yaml_config_start = "[,yaml]\n----\n"
 yaml_config_end = "----"
-output_content = intro
-output_properties = ""
 total_properties =0
 
 try:
@@ -43,13 +60,12 @@ except json.JSONDecodeError as e:
     print(f"Error: Failed to parse JSON in '{input_json_file}': {str(e)}")
     exit(1)
 
-
-
 properties = data.get("properties")
+total_properties = len(properties)
 if properties is not None:
-    total_properties = len(properties)
     # Write each property on a separate line
     for key, value in properties.items():
+        output_property=""
         if (value.get("is_deprecated") is True):
             deprecated_properties+=key+"\n"
             continue
@@ -61,7 +77,7 @@ if properties is not None:
             empty_type+=key+"\n"
         if value.get("visibility") is None:
             empty_visibility+=key+"\n"
-        if any(field is None for field in [value.get("description"), key, value.get("nullable"), value.get("type"), value.get("visibility")]):
+        if any(field is None for field in [value.get("description"), key, value.get("nullable"), value.get("type")]):
             continue
 
         #have max but dont have min    
@@ -73,32 +89,49 @@ if properties is not None:
             if(value.get("maximum")) is None:
                 min_without_max+=key+"\n"
 
-        output_properties += (f"== {key}\n\n")
-        output_properties += value.get("description") + "\n\n"
-        output_properties += "*Requires Restart:* " + ("Yes" if value.get("needs_restart", False) else "No") + "\n\n"
-        output_properties += "*Nullable:* " + ("Yes" if value.get("nullable", False) else "No") + "\n\n"
-        output_properties += "*Visibility:* " + (value.get("visibility")) + "\n\n"
-        output_properties += "*Type:* " + (value.get("type")) + "\n\n"
+        output_property += (f"=== {key}\n\n")
+        output_property += value.get("description") + "\n\n"
+        #all node_config require restart, regardless of original data
+        if value.get("defined_in") == "src/v/config/node_config.cc":
+            output_property += "*Requires Restart:* " +"Yes" +"\n\n"
+        else:
+            output_property += "*Requires Restart:* " + ("Yes" if value.get("needs_restart", False) else "No") + "\n\n"
+        output_property += "*Nullable:* " + ("Yes" if value.get("nullable", False) else "No") + "\n\n"   
+        if value.get("visibility") is None:
+            visibility_text = "None"
+        else:
+            visibility_text = value.get("visibility")
+
+        output_property += "*Visibility:* " + visibility_text + "\n\n"
+        output_property += "*Type:* " + (value.get("type")) + "\n\n"
         if value.get('maximum') is not None and value.get('minimum') is not None:
-            output_properties += "*Accepted values:* " + "[%d, %d]\n\n" % (value.get("minimum"), value.get("maximum"))
+            output_property += "*Accepted values:* " + "[%d, %d]\n\n" % (value.get("minimum"), value.get("maximum"))
 
-        output_properties += "*Default:* %r\n\n" % value.get("default")
-
-        # hard todo
+        output_property += "*Default:* %r\n\n" % value.get("default")
         
-        output_properties += "*Example:* "+ "\n\n"
+        # hard todo
+        #output_property += "*Example:* "+ "\n\n"
+        if value.get("defined_in") == "src/v/config/node_config.cc":
+            broker_properties+=output_property  
+        elif value.get("defined_in") == "src/v/pandaproxy/schema_registry/configuration.cc":
+            schema_registry_properties+=output_property 
+        elif value.get("defined_in") == "src/v/pandaproxy/rest/configuration.cc":
+            pandaproxy_properties+=output_property  
+        elif value.get("defined_in") == "src/v/kafka/client/configuration.cc":
+            kafka_client_properties+=output_property  
+        elif value.get("defined_in") == "src/v/config/configuration.cc":
+            cluster_config_properties+=output_property
 
 
-
+final_page = intro + broker_properties + "\n\n"+ cluster_config_properties + "\n\n"+kafka_client_properties+"\n\n"+pandaproxy_properties+"\n\n"+schema_registry_properties
 try:
     with open(os.path.join(output_path, output_file), "w+") as output:
-        output.write(output_content + output_properties)
+        output.write(final_page)
 except Exception as e:
     print(f"Error: Failed to write data to {output_file}: {str(e)}")
     exit(1)
 print(f"Data from {input_json_file} has been written to {output_file} successfully.")
 print(f"Total properties read {total_properties}")
-
 
 def write_error_file(output_path, error_file, error_content):
     file_path = os.path.join(output_path, error_file)
