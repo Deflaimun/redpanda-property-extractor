@@ -319,6 +319,18 @@
             "nullable": false,
             "type": "boolean"
         },
+        "alive_timeout_ms": {
+            "default": "5s",
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Time from the last node status heartbeat after which a node will be considered offline and not alive",
+            "maximum": 17592186044415,
+            "minimum": -17592186044416,
+            "name": "alive_timeout_ms",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "integer",
+            "visibility": "tunable"
+        },
         "alter_topic_cfg_timeout_ms": {
             "default": "5s",
             "defined_in": "src/v/config/configuration.cc",
@@ -583,6 +595,16 @@
             "type": "string",
             "visibility": "user"
         },
+        "cloud_storage_azure_managed_identity_id": {
+            "default": null,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "The managed identity ID to use with Azure Managed Identities. This takes affect when the cloud_storage_credential_source configuration option is set to azure_vm_instance_metadata.",
+            "name": "cloud_storage_azure_managed_identity_id",
+            "needs_restart": false,
+            "nullable": true,
+            "type": "string",
+            "visibility": "user"
+        },
         "cloud_storage_azure_shared_key": {
             "default": null,
             "defined_in": "src/v/config/configuration.cc",
@@ -787,6 +809,16 @@
             "needs_restart": true,
             "nullable": false,
             "type": "#/definitions/model::cloud_credentials_source",
+            "visibility": "user"
+        },
+        "cloud_storage_disable_archiver_manager": {
+            "default": true,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Use legacy upload mode and do not start archiver_manager.",
+            "name": "cloud_storage_disable_archiver_manager",
+            "needs_restart": true,
+            "nullable": false,
+            "type": "boolean",
             "visibility": "user"
         },
         "cloud_storage_disable_chunk_reads": {
@@ -1212,6 +1244,28 @@
             "needs_restart": false,
             "nullable": false,
             "type": "integer",
+            "visibility": "tunable"
+        },
+        "cloud_storage_recovery_topic_validation_depth": {
+            "default": 10,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Number of segment metadata to validate, from newest to oldest, when `cloud_storage_recovery_topic_validation_mode` is `check_manifest_and_segment_metadata`",
+            "maximum": 4294967295,
+            "minimum": 0,
+            "name": "cloud_storage_recovery_topic_validation_depth",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "integer",
+            "visibility": "tunable"
+        },
+        "cloud_storage_recovery_topic_validation_mode": {
+            "default": "model::recovery_validation_mode::check_manifest_existence",
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Validation mode performed before recovering a topic from cloud storage",
+            "name": "cloud_storage_recovery_topic_validation_mode",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "model::recovery_validation_mode",
             "visibility": "tunable"
         },
         "cloud_storage_region": {
@@ -1791,7 +1845,7 @@
             "visibility": "user"
         },
         "data_transforms_logging_buffer_capacity_bytes": {
-            "default": 102400,
+            "default": 512000,
             "defined_in": "src/v/config/configuration.cc",
             "description": "Buffer capacity for transform logs, per shard. Buffer occupancy is calculated as the total size of buffered (i.e. emitted but not yet produced) log messages.",
             "name": "data_transforms_logging_buffer_capacity_bytes",
@@ -2147,14 +2201,12 @@
             "visibility": "user"
         },
         "fetch_read_strategy": {
-            "default": "model::fetch_read_strategy::non_polling",
             "defined_in": "src/v/config/configuration.cc",
-            "description": "The strategy used to fulfill fetch requests",
+            "description": null,
+            "is_deprecated": true,
             "name": "fetch_read_strategy",
-            "needs_restart": false,
             "nullable": false,
-            "type": "model::fetch_read_strategy",
-            "visibility": "tunable"
+            "type": null
         },
         "fetch_reads_debounce_timeout": {
             "default": "1ms",
@@ -3658,6 +3710,16 @@
             "type": "number",
             "visibility": "tunable"
         },
+        "partition_autobalancing_topic_aware": {
+            "default": true,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "If true, Redpanda will prioritize balancing topic-wise number of partitions on each node, as opposed to balancing the total number of partitions. This should give better balancing results if topics with diverse partition sizes and load profiles are present in the cluster.",
+            "name": "partition_autobalancing_topic_aware",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "boolean",
+            "visibility": "user"
+        },
         "partition_manager_shutdown_watchdog_timeout": {
             "default": "30s",
             "defined_in": "src/v/config/configuration.cc",
@@ -3785,14 +3847,14 @@
         "raft_flush_timer_interval_ms": {
             "default": "100ms",
             "defined_in": "src/v/config/configuration.cc",
-            "description": "Interval of checking partition against the `raft_replica_max_pending_flush_bytes`",
+            "description": "Interval of checking partition against the `raft_replica_max_pending_flush_bytes`, deprecated started 24.1, use raft_replica_max_flush_delay_ms instead ",
+            "is_deprecated": true,
             "maximum": 17592186044415,
             "minimum": -17592186044416,
             "name": "raft_flush_timer_interval_ms",
-            "needs_restart": false,
             "nullable": false,
-            "type": "integer",
-            "visibility": "tunable"
+            "type": null,
+            "visibility": "deprecated"
         },
         "raft_heartbeat_disconnect_failures": {
             "default": 3,
@@ -3900,6 +3962,18 @@
             "type": "boolean",
             "visibility": "tunable"
         },
+        "raft_replica_max_flush_delay_ms": {
+            "default": "100ms",
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Maximum delay (in ms) between two subsequent flushes. After this delay, the log will be automatically force flushed.",
+            "maximum": 17592186044415,
+            "minimum": -17592186044416,
+            "name": "raft_replica_max_flush_delay_ms",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "integer",
+            "visibility": "tunable"
+        },
         "raft_replica_max_pending_flush_bytes": {
             "default": 262144,
             "defined_in": "src/v/config/configuration.cc",
@@ -3961,6 +4035,16 @@
             "maximum": 17592186044415,
             "minimum": -17592186044416,
             "name": "readers_cache_eviction_timeout_ms",
+            "nullable": false,
+            "type": "integer",
+            "visibility": "tunable"
+        },
+        "readers_cache_target_max_size": {
+            "default": 200,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Maximum desired number of readers cached per ntp. This a soft limit, a number of readers in cache may temporary increase as cleanup is done in background",
+            "name": "readers_cache_target_max_size",
+            "needs_restart": false,
             "nullable": false,
             "type": "integer",
             "visibility": "tunable"
@@ -4971,6 +5055,18 @@
             "type": "integer",
             "visibility": "tunable"
         },
+        "virtual_cluster_min_producer_ids": {
+            "default": "std::numeric_limits<uint64_t>::max()",
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Minimum number of active producers per virtual cluster",
+            "maximum": 18446744073709551615,
+            "minimum": 0,
+            "name": "virtual_cluster_min_producer_ids",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "integer",
+            "visibility": "tunable"
+        },
         "wait_for_leader_timeout_ms": {
             "default": "5'000ms",
             "defined_in": "src/v/config/configuration.cc",
@@ -4982,6 +5078,16 @@
             "nullable": false,
             "type": "integer",
             "visibility": "tunable"
+        },
+        "write_caching": {
+            "default": "model::write_caching_mode::off",
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Cache batches until the segment appender chunk is full instead of flushing for every acks=all write. This is the global default for all topics and can be overriden at a topic scope with property write.caching. 'disabled' mode takes precedence over topic overrides and disables the feature altogether for the entire cluster.",
+            "name": "write_caching",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "model::write_caching_mode",
+            "visibility": "user"
         },
         "zstd_decompress_workspace_bytes": {
             "default": 8388608,
