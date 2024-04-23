@@ -4,19 +4,31 @@ import os
 input_json_path = "gen/"
 input_json_file = "properties-output.json"
 
-output_path = "output/pages/"
+input_existing_path = "input/"
+input_json_broker_file = "broker-properties.json"
+input_json_cluster_file = "cluster-properties.json"
+
+output_path = "output/"
+page_folder = output_path+"pages/"
 output_file_broker = "broker-properties.adoc"
 output_file_cluster = "cluster-properties.adoc"
 output_file_cloud = "cloud-properties.adoc"
 output_file_deprecated ="deprecated/index.adoc"
 
-error_folder = "output/error"
+error_folder = output_path + "error/"
 error_file_description = "empty_description.txt"
 error_file_nullable = "empty_nullable.txt"
 error_file_type = "empty_type.txt"
 error_file_visibility = "empty_visibility.txt"
 error_file_max_without_min = "max_without_min.txt"
 error_file_min_without_max = "min_without_max.txt"
+
+
+modified_properties_file = "modified_properties.txt"
+modified_properties_content = ""
+all_properties_file = "all_properties.txt"
+all_properties=""
+all_properties_count = 0
 
 file_deprecated_properties_error ="deprecated_properties.txt"
 deprecated_properties_error =""
@@ -73,15 +85,22 @@ total_broker_properties=0
 total_cluster_properties=0
 total_cloud_properties=0
 
-try:
-    with open(os.path.join(input_json_path, input_json_file), 'r') as json_file:
-        data = json.load(json_file)
-except FileNotFoundError:
-    print(f"Error: The file '{input_json_file}' does not exist.")
-    exit(1)
-except json.JSONDecodeError as e:
-    print(f"Error: Failed to parse JSON in '{input_json_file}': {str(e)}")
-    exit(1)
+def load_json(input_json_path, input_json_file):
+    try:
+        with open(os.path.join(input_json_path, input_json_file), 'r') as json_file:
+            data = json.load(json_file)
+            return data
+    except FileNotFoundError:
+        print(f"Error: The file '{input_json_file}' does not exist.")
+    except json.JSONDecodeError as e:
+        print(f"Error: Failed to parse JSON in '{input_json_file}': {str(e)}")
+
+data = load_json(input_json_path, input_json_file)
+existing_cluster_properties = load_json(input_existing_path, input_json_cluster_file)
+existing_broker_properties = load_json(input_existing_path, input_json_broker_file)
+
+cluster_data = existing_cluster_properties.get("properties")
+broker_data = existing_broker_properties.get("properties")
 
 properties = data.get("properties")
 total_properties = len(properties)
@@ -89,15 +108,30 @@ if properties is not None:
     # Write each property on a separate line
     for key, value in properties.items():
         output_property=""
+        if value.get("defined_in") == "src/v/config/node_config.cc":
+            kind = "broker"
+        elif value.get("defined_in") == "src/v/config/configuration.cc":
+            kind = "cluster"
         if (value.get("is_deprecated") is True):
             deprecated_properties_error+=key+"\n"
-            if value.get("defined_in") == "src/v/config/node_config.cc":
+            if kind == "broker":
                 deprecated_broker_properties+="- "+key+"\n\n"
-            elif value.get("defined_in") == "src/v/config/configuration.cc":
+            elif kind =="cluster":
                 deprecated_cluster_properties+="- "+key+"\n\n"
             continue
 
+
         description = value.get("description")
+        ## Check if this property has already been modified
+        if kind=="broker" and broker_data.get(key) is not None:
+            if description != broker_data.get(key).get("description"):
+                description = broker_data.get(key).get("description")
+                modified_properties_content+=key + " - " +kind + "\n"
+        elif kind =="cluster" and cluster_data.get(key) is not None:
+            if description != cluster_data.get(key).get("description"):
+                description = cluster_data.get(key).get("description")
+                modified_properties_content+=key + " - " +kind + "\n"
+
         nullable = value.get("nullable")
         type = value.get("type")
         visibility = value.get("visibility")
@@ -161,22 +195,39 @@ if properties is not None:
         if key.startswith("cloud_"):
             cloud_config_properties+=output_property
             total_cloud_properties+=1
+            group="cloud"
         elif value.get("defined_in") == "src/v/config/node_config.cc":
             broker_properties+=output_property
             total_broker_properties+=1  
+            group="node"
         elif value.get("defined_in") == "src/v/pandaproxy/schema_registry/configuration.cc":
             schema_registry_properties+=output_property 
             total_broker_properties+=1
+            group="schema reg"
         elif value.get("defined_in") == "src/v/pandaproxy/rest/configuration.cc":
             pandaproxy_properties+=output_property  
             total_broker_properties+=1
+            group="http proxy"
         elif value.get("defined_in") == "src/v/kafka/client/configuration.cc":
             kafka_client_properties+=output_property  
             total_broker_properties+=1
+            group="http client"
         elif value.get("defined_in") == "src/v/config/configuration.cc":
             cluster_config_properties+=output_property
             total_cluster_properties+=1
+            group="cluster"
 
+        if all_properties_count<=105:
+            person = "Jake"
+        elif all_properties_count<=210:
+            person = "Michele"
+        elif all_properties_count<=315:
+            person = "Kat"
+        elif all_properties_count<=450:
+            person = "Greg"
+        
+        all_properties+=key+" - "+group+ " - "+person+"\n"
+        all_properties_count+=1
 
 
 broker_page = broker_page_title + broker_intro + broker_title + broker_properties +"\n\n" 
@@ -238,11 +289,15 @@ print(f"Total Broker properties read {total_broker_properties}")
 print(f"Total Cluster properties read {total_cluster_properties}")
 print(f"Total Cloud properties read {total_cloud_properties}")
 
-write_data_to_file(output_path, output_file_broker, broker_page)
-write_data_to_file(output_path, output_file_cluster, cluster_page)
-write_data_to_file(output_path, output_file_cloud, cloud_page)
 
-write_data_to_file_end(output_path, output_file_deprecated, deprecated_page)    
+write_data_to_file(page_folder, output_file_broker, broker_page)
+write_data_to_file(page_folder, output_file_cluster, cluster_page)
+write_data_to_file(page_folder, output_file_cloud, cloud_page)
+
+write_data_to_file(output_path, all_properties_file, all_properties)
+write_data_to_file(output_path, modified_properties_file, modified_properties_content)
+
+write_data_to_file_end(page_folder, output_file_deprecated, deprecated_page)    
 
 write_error_file(error_folder,error_file_description,empty_description)
 write_error_file(error_folder,error_file_nullable,empty_nullable)
