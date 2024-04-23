@@ -163,6 +163,8 @@ This is an exhaustive list of all the deprecated properties.
 
 - enable_coproc
 
+- fetch_read_strategy
+
 - full_raft_configuration_recovery_pattern
 
 - health_monitor_tick_interval
@@ -174,6 +176,8 @@ This is an exhaustive list of all the deprecated properties.
 - min_version
 
 - partition_autobalancing_movement_batch_size_bytes
+
+- raft_flush_timer_interval_ms
 
 - rm_violation_recovery_policy
 

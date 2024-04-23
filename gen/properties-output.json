@@ -595,6 +595,16 @@
             "type": "string",
             "visibility": "user"
         },
+        "cloud_storage_azure_hierarchical_namespace_enabled": {
+            "default": null,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Whether or not Azure Hierarchical Namespaces are enabled on the cloud_storage_azure_storage_account. If this property is not set, cloud_storage_azure_shared_key must be set, and each node will try to determine at startup if HNS is enabled. Setting this property to True will disable the check and assume HNS is active. Setting to False will disable the check and assume that HNS is not active.",
+            "name": "cloud_storage_azure_hierarchical_namespace_enabled",
+            "needs_restart": true,
+            "nullable": true,
+            "type": "boolean",
+            "visibility": "tunable"
+        },
         "cloud_storage_azure_managed_identity_id": {
             "default": null,
             "defined_in": "src/v/config/configuration.cc",
@@ -2808,7 +2818,7 @@
             "visibility": "user"
         },
         "kafka_quota_balancer_node_period": {
-            "default": "750ms",
+            "default": "0ms",
             "defined_in": "src/v/config/configuration.cc",
             "description": "Intra-node throughput quota balancer invocation period, in milliseconds. Value of 0 disables the balancer and makes all the throughput quotas immutable.",
             "maximum": 17592186044415,
@@ -3291,6 +3301,16 @@
             "needs_restart": false,
             "nullable": true,
             "type": "integer",
+            "visibility": "tunable"
+        },
+        "lz4_decompress_reusable_buffers_disabled": {
+            "default": false,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Disable reusable preallocated buffers for LZ4 decompression",
+            "name": "lz4_decompress_reusable_buffers_disabled",
+            "needs_restart": true,
+            "nullable": false,
+            "type": "boolean",
             "visibility": "tunable"
         },
         "max_compacted_log_segment_size": {
@@ -3832,6 +3852,16 @@
             "needs_restart": false,
             "nullable": false,
             "type": "integer",
+            "visibility": "tunable"
+        },
+        "raft_enable_longest_log_detection": {
+            "default": true,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Enables additional step in leader election where candidate is allowed to wait for all the replies from node it requested votes from. This may introduce a small delay when recovering from failure but will prevent truncation if any of the replicas has more data than the majority.",
+            "name": "raft_enable_longest_log_detection",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "boolean",
             "visibility": "tunable"
         },
         "raft_enable_lw_heartbeat": {
@@ -5079,11 +5109,11 @@
             "type": "integer",
             "visibility": "tunable"
         },
-        "write_caching": {
-            "default": "model::write_caching_mode::off",
+        "write_caching_default": {
+            "default": "model::write_caching_mode::default_false",
             "defined_in": "src/v/config/configuration.cc",
             "description": "Cache batches until the segment appender chunk is full instead of flushing for every acks=all write. This is the global default for all topics and can be overriden at a topic scope with property write.caching. 'disabled' mode takes precedence over topic overrides and disables the feature altogether for the entire cluster.",
-            "name": "write_caching",
+            "name": "write_caching_default",
             "needs_restart": false,
             "nullable": false,
             "type": "model::write_caching_mode",
