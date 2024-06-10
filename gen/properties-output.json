@@ -345,7 +345,7 @@
         },
         "api_doc_dir": {
             "default": "/usr/share/redpanda/proxy-api-doc",
-            "defined_in": "src/v/pandaproxy/rest/configuration.cc",
+            "defined_in": "src/v/pandaproxy/schema_registry/configuration.cc",
             "description": "API doc directory",
             "name": "api_doc_dir",
             "nullable": false,
@@ -755,6 +755,26 @@
             "needs_restart": false,
             "nullable": false,
             "type": "integer",
+            "visibility": "tunable"
+        },
+        "cloud_storage_cache_trim_threshold_percent_objects": {
+            "default": null,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Trim is triggered when the cache reaches this percent of the maximum object count. If this is unset, the default behavioris to start trim when the cache is about 100\\% full.",
+            "name": "cloud_storage_cache_trim_threshold_percent_objects",
+            "needs_restart": false,
+            "nullable": true,
+            "type": "number",
+            "visibility": "tunable"
+        },
+        "cloud_storage_cache_trim_threshold_percent_size": {
+            "default": null,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Trim is triggered when the cache reaches this percent of the maximum cache size. If this is unset, the default behavioris to start trim when the cache is about 100\\% full.",
+            "name": "cloud_storage_cache_trim_threshold_percent_size",
+            "needs_restart": false,
+            "nullable": true,
+            "type": "number",
             "visibility": "tunable"
         },
         "cloud_storage_chunk_eviction_strategy": {
