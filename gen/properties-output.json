@@ -711,18 +711,6 @@
             "type": "integer",
             "visibility": "tunable"
         },
-        "cloud_storage_cache_num_buckets": {
-            "default": 0,
-            "defined_in": "src/v/config/configuration.cc",
-            "description": "Divide cloud storage cache across specified number of buckets. This only works for objects with randomized prefixes. The names will not be changed if the value is set to zero.",
-            "maximum": 4294967295,
-            "minimum": 0,
-            "name": "cloud_storage_cache_num_buckets",
-            "needs_restart": false,
-            "nullable": false,
-            "type": "integer",
-            "visibility": "tunable"
-        },
         "cloud_storage_cache_size": {
             "default": 0,
             "defined_in": "src/v/config/configuration.cc",
@@ -755,26 +743,6 @@
             "needs_restart": false,
             "nullable": false,
             "type": "integer",
-            "visibility": "tunable"
-        },
-        "cloud_storage_cache_trim_threshold_percent_objects": {
-            "default": null,
-            "defined_in": "src/v/config/configuration.cc",
-            "description": "Trim is triggered when the cache reaches this percent of the maximum object count. If this is unset, the default behavioris to start trim when the cache is about 100\\% full.",
-            "name": "cloud_storage_cache_trim_threshold_percent_objects",
-            "needs_restart": false,
-            "nullable": true,
-            "type": "number",
-            "visibility": "tunable"
-        },
-        "cloud_storage_cache_trim_threshold_percent_size": {
-            "default": null,
-            "defined_in": "src/v/config/configuration.cc",
-            "description": "Trim is triggered when the cache reaches this percent of the maximum cache size. If this is unset, the default behavioris to start trim when the cache is about 100\\% full.",
-            "name": "cloud_storage_cache_trim_threshold_percent_size",
-            "needs_restart": false,
-            "nullable": true,
-            "type": "number",
             "visibility": "tunable"
         },
         "cloud_storage_chunk_eviction_strategy": {
@@ -863,15 +831,6 @@
             "needs_restart": true,
             "nullable": false,
             "type": "#/definitions/model::cloud_credentials_source",
-            "visibility": "user"
-        },
-        "cloud_storage_crl_file": {
-            "default": null,
-            "defined_in": "src/v/config/configuration.cc",
-            "description": "Path to certificate revocation list for cloud_storage_trust_file.",
-            "name": "cloud_storage_crl_file",
-            "nullable": true,
-            "type": "string",
             "visibility": "user"
         },
         "cloud_storage_disable_archiver_manager": {
@@ -1380,7 +1339,6 @@
             "maximum": 17179869183,
             "minimum": -17179869184,
             "name": "cloud_storage_segment_max_upload_interval_sec",
-            "needs_restart": false,
             "nullable": true,
             "type": "integer",
             "visibility": "tunable"
@@ -1526,7 +1484,6 @@
             "maximum": 17592186044415,
             "minimum": -17592186044416,
             "name": "cloud_storage_upload_loop_initial_backoff_ms",
-            "needs_restart": false,
             "nullable": false,
             "type": "integer",
             "visibility": "tunable"
@@ -1538,20 +1495,9 @@
             "maximum": 17592186044415,
             "minimum": -17592186044416,
             "name": "cloud_storage_upload_loop_max_backoff_ms",
-            "needs_restart": false,
             "nullable": false,
             "type": "integer",
             "visibility": "tunable"
-        },
-        "cloud_storage_url_style": {
-            "default": null,
-            "defined_in": "src/v/config/configuration.cc",
-            "description": "Specifies the addressing style to use for Amazon S3 requests. This configuration determines how S3 bucket URLs are formatted. You can choose between: `virtual_host`, (e.g. `<bucket-name>.s3.amazonaws.com`), `path`, (e.g. `s3.amazonaws.com/<bucket-name>`), and `null`. Path style is supported for backward compatibility with legacy systems. When this property is not set (`null`), the client tries to use `virtual_host` addressing. If the initial request fails, the client automatically tries the `path` style. If neither addressing style works, Redpanda terminates the startup, requiring manual configuration to proceed.",
-            "name": "cloud_storage_url_style",
-            "needs_restart": true,
-            "nullable": true,
-            "type": "s3_url_style",
-            "visibility": "user"
         },
         "cluster_id": {
             "default": null,
@@ -1972,16 +1918,6 @@
             "type": "integer",
             "visibility": "user"
         },
-        "data_transforms_read_buffer_memory_percentage": {
-            "default": 45,
-            "defined_in": "src/v/config/configuration.cc",
-            "description": "The percentage of available memory in the transform subsystem to use for read buffers",
-            "name": "data_transforms_read_buffer_memory_percentage",
-            "needs_restart": true,
-            "nullable": false,
-            "type": "integer",
-            "visibility": "tunable"
-        },
         "data_transforms_runtime_limit_ms": {
             "default": "3s",
             "defined_in": "src/v/config/configuration.cc",
@@ -1989,16 +1925,6 @@
             "maximum": 17592186044415,
             "minimum": -17592186044416,
             "name": "data_transforms_runtime_limit_ms",
-            "needs_restart": true,
-            "nullable": false,
-            "type": "integer",
-            "visibility": "tunable"
-        },
-        "data_transforms_write_buffer_memory_percentage": {
-            "default": 45,
-            "defined_in": "src/v/config/configuration.cc",
-            "description": "The percentage of available memory in the transform subsystem to use for write buffers",
-            "name": "data_transforms_write_buffer_memory_percentage",
             "needs_restart": true,
             "nullable": false,
             "type": "integer",
@@ -2350,15 +2276,6 @@
             "name": "find_coordinator_timeout_ms",
             "nullable": false,
             "type": "integer",
-            "visibility": "user"
-        },
-        "fips_mode": {
-            "default": "fips_mode_flag::disabled",
-            "defined_in": "src/v/config/node_config.cc",
-            "description": "Controls whether Redpanda starts in FIPS mode.  This property allows for three values: 'disabled', 'enabled', and 'permissive'.  With 'enabled', Redpanda first verifies that the operating system is enabled for FIPS by checking /proc/sys/crypto/fips_enabled.  If the file does not exist or does not return '1', Redpanda immediately exits.  With 'permissive', the same check is performed but a WARNING is logged and Redpanda continues to run.  After the check is complete, Redpanda loads the OpenSSL FIPS provider into the OpenSSL library.  After this is complete, Redpanda is operating in FIPS mode, which means that the TLS cipher suites available to users are limited to TLSv1.2 and TLSv1.3, and of those, only the ones that use NIST-approved cryptographic methods.  For more information about FIPS, refer to Redpanda documentation.",
-            "name": "fips_mode",
-            "nullable": false,
-            "type": "fips_mode_flag",
             "visibility": "user"
         },
         "full_raft_configuration_recovery_pattern": {
@@ -3739,24 +3656,6 @@
             "name": "oidc_token_audience",
             "needs_restart": false,
             "nullable": false,
-            "type": "string",
-            "visibility": "user"
-        },
-        "openssl_config_file": {
-            "default": null,
-            "defined_in": "src/v/config/node_config.cc",
-            "description": "Path to the configuration file used by OpenSSL to propertly load the FIPS-compliant module.",
-            "name": "openssl_config_file",
-            "nullable": true,
-            "type": "string",
-            "visibility": "user"
-        },
-        "openssl_module_directory": {
-            "default": null,
-            "defined_in": "src/v/config/node_config.cc",
-            "description": "Path to the directory that contains the OpenSSL FIPS-compliant module.",
-            "name": "openssl_module_directory",
-            "nullable": true,
             "type": "string",
             "visibility": "user"
         },
