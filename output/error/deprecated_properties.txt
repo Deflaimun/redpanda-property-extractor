@@ -11,7 +11,6 @@ enable_admin_api
 enable_auto_rebalance_on_node_add
 enable_central_config
 enable_coproc
-fetch_read_strategy
 full_raft_configuration_recovery_pattern
 health_monitor_tick_interval
 id_allocator_replication

@@ -1,31 +1,24 @@
 import json
 import os
 
-input_json_path = "gen/"
+input_json_path = "../gen/"
 input_json_file = "properties-output.json"
 
-input_existing_path = "input/"
-input_json_broker_file = "broker-properties.json"
-input_json_cluster_file = "cluster-properties.json"
-
-output_path = "output/"
+output_path = "../output/"
 page_folder = output_path+"pages/"
 output_file_broker = "broker-properties.adoc"
 output_file_cluster = "cluster-properties.adoc"
 output_file_cloud = "cloud-properties.adoc"
-output_file_deprecated ="deprecated/index.adoc"
+output_file_deprecated ="deprecated/partials/deprecated-properties.adoc"
 
 error_folder = output_path + "error/"
 error_file_description = "empty_description.txt"
 error_file_nullable = "empty_nullable.txt"
 error_file_type = "empty_type.txt"
-error_file_visibility = "empty_visibility.txt"
 error_file_max_without_min = "max_without_min.txt"
 error_file_min_without_max = "min_without_max.txt"
 
 
-modified_properties_file = "modified_properties.txt"
-modified_properties_content = ""
 all_properties_file = "all_properties.txt"
 all_properties=""
 all_properties_count = 0
@@ -96,11 +89,6 @@ def load_json(input_json_path, input_json_file):
         print(f"Error: Failed to parse JSON in '{input_json_file}': {str(e)}")
 
 data = load_json(input_json_path, input_json_file)
-existing_cluster_properties = load_json(input_existing_path, input_json_cluster_file)
-existing_broker_properties = load_json(input_existing_path, input_json_broker_file)
-
-cluster_data = existing_cluster_properties.get("properties")
-broker_data = existing_broker_properties.get("properties")
 
 properties = data.get("properties")
 total_properties = len(properties)
@@ -122,15 +110,6 @@ if properties is not None:
 
 
         description = value.get("description")
-        ## Check if this property has already been modified
-        if kind=="broker" and broker_data.get(key) is not None:
-            if description != broker_data.get(key).get("description"):
-                description = broker_data.get(key).get("description")
-                modified_properties_content+=key + " - " +kind + "\n"
-        elif kind =="cluster" and cluster_data.get(key) is not None:
-            if description != cluster_data.get(key).get("description"):
-                description = cluster_data.get(key).get("description")
-                modified_properties_content+=key + " - " +kind + "\n"
 
         nullable = value.get("nullable")
         type = value.get("type")
@@ -142,8 +121,7 @@ if properties is not None:
         if type is None or type =='':
             empty_type+=key+"\n"
         if visibility is None or visibility =='':
-            empty_visibility+=key+"\n"
-            visibility = "None"
+            visibility = "user"
         if any(field is None or field == "" for field in [description, key, nullable, type]):
             continue
 
@@ -217,18 +195,9 @@ if properties is not None:
             total_cluster_properties+=1
             group="cluster"
 
-        if all_properties_count<=105:
-            person = "Jake"
-        elif all_properties_count<=210:
-            person = "Michele"
-        elif all_properties_count<=315:
-            person = "Kat"
-        elif all_properties_count<=450:
-            person = "Greg"
         
-        all_properties+=key+" - "+group+ " - "+person+"\n"
+        all_properties+=key+'\n'
         all_properties_count+=1
-
 
 broker_page = broker_page_title + broker_intro + broker_title + broker_properties +"\n\n" 
 broker_page +=schema_registry_title + schema_registry_intro + schema_registry_properties+"\n\n"
@@ -273,17 +242,6 @@ def write_error_file(output_path, error_file, error_content):
     except Exception as e:
         print(f"Error: Failed to write data to '{error_file}': {str(e)}")
 
-def write_data_to_file_end(output_path, output_file, data):
-    try:
-        with open(os.path.join(output_path, output_file), "a") as output:
-            output.write(data)
-    except Exception as e:
-        print(f"Error: Failed to write data to {output_file}: {str(e)}")
-        return False
-    else:
-        print(f"Data has been appended to {output_file} successfully.")
-        return True
-
 print(f"Total properties read {total_properties}")
 print(f"Total Broker properties read {total_broker_properties}")
 print(f"Total Cluster properties read {total_cluster_properties}")
@@ -293,16 +251,13 @@ print(f"Total Cloud properties read {total_cloud_properties}")
 write_data_to_file(page_folder, output_file_broker, broker_page)
 write_data_to_file(page_folder, output_file_cluster, cluster_page)
 write_data_to_file(page_folder, output_file_cloud, cloud_page)
+write_data_to_file(page_folder, output_file_deprecated, deprecated_page)    
 
 write_data_to_file(output_path, all_properties_file, all_properties)
-write_data_to_file(output_path, modified_properties_file, modified_properties_content)
-
-write_data_to_file_end(page_folder, output_file_deprecated, deprecated_page)    
 
 write_error_file(error_folder,error_file_description,empty_description)
 write_error_file(error_folder,error_file_nullable,empty_nullable)
 write_error_file(error_folder,error_file_type,empty_type)
-write_error_file(error_folder,error_file_visibility,empty_visibility)
 write_error_file(error_folder,error_file_max_without_min,max_without_min)
 write_error_file(error_folder,error_file_min_without_max,min_without_max)
 write_error_file(error_folder,file_deprecated_properties_error,deprecated_properties_error)

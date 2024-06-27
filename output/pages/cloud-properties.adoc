@@ -7,7 +7,7 @@ Cloud properties intro
 
 === cloud_storage_access_key
 
-AWS or GCP access key.
+AWS access key.
 
 *Requires Restart:* No
 
@@ -24,9 +24,6 @@ AWS or GCP access key.
 === cloud_storage_api_endpoint
 
 Optional API endpoint.
-
-- AWS: when left blank, it's automatically generated using <<cloud_storage_region,region>> property, and <<cloud_storage_bucket,bucket>> property. Otherwise uses the value assigned.
-- GCP: use `storage.googleapis.com`.
 
 *Requires Restart:* No
 
@@ -110,15 +107,7 @@ Azure Data Lake Storage v2 port override. Also see cloud_storage_azure_adls_endp
 
 === cloud_storage_azure_container
 
-The name of the Azure container to use with Tiered Storage. If `null`, the property is disabled.
-
-NOTE: The container must belong to <<cloud_storage_azure_storage_account,cloud_storage_azure_storage_account>>.
-
-*Type*: string
-
-
-
-*Supported versions*: Redpanda v23.1 or later.
+The name of the Azure container to use with Tiered Storage. Note that the container must belong to 'cloud_storage_azure_storage_account'.
 
 *Requires Restart:* Yes
 
@@ -166,15 +155,7 @@ The managed identity ID to use with Azure Managed Identities. This takes affect 
 
 === cloud_storage_azure_shared_key
 
-The shared key to be used for Azure Shared Key authentication with the Azure storage account configured by <<cloud_storage_azure_storage_account,cloud_storage_azure_storage_account>>.  If `null`, the property is disabled.
-
-NOTE: Redpanda expects this key string to be Base64 encoded.
-
-*Type*: string
-
-
-
-*Supported versions*: Redpanda v23.1 or later.
+The shared key to be used for Azure Shared Key authentication with the configured Azure storage account (see 'cloud_storage_azure_storage_account)'. Note that Redpanda expects this string to be Base64 encoded.
 
 *Requires Restart:* No
 
@@ -190,13 +171,7 @@ NOTE: Redpanda expects this key string to be Base64 encoded.
 
 === cloud_storage_azure_storage_account
 
-The name of the Azure storage account to use with Tiered Storage. If `null`, the property is disabled.
-
-*Type*: string
-
-
-
-*Supported versions*: Redpanda v23.1 or later.
+The name of the Azure storage account to use with Tiered Storage.
 
 *Requires Restart:* Yes
 
@@ -244,7 +219,7 @@ The number of total requests that the cloud storage background jobs are allowed 
 
 === cloud_storage_bucket
 
-AWS or GCS bucket that should be used to store data.
+AWS bucket that should be used to store data.
 
 *Requires Restart:* No
 
@@ -296,7 +271,7 @@ Size of chunks of segments downloaded into cloud storage cache. Reduces space us
 
 === cloud_storage_cache_directory
 
-The directory where the cache archive is stored. This property is mandatory when xref:./cluster-properties.adoc#cloud_storage_enabled[cloud_storage_enabled] is set to `true`.
+Directory for archival cache. Should be present when `cloud_storage_enabled` is present.
 
 *Requires Restart:* Yes
 
@@ -328,11 +303,27 @@ Maximum number of objects that may be held in the tiered storage cache.  This ap
 
 ---
 
+=== cloud_storage_cache_num_buckets
+
+Divide cloud storage cache across specified number of buckets. This only works for objects with randomized prefixes. The names will not be changed if the value is set to zero.
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* integer
+
+*Accepted values:* [`0`, `4294967295`]
+
+*Default:* `0`
+
+---
+
 === cloud_storage_cache_size
 
-Max size of object storage cache.
-
-*Units*: bytes.
+Max size of archival cache.
 
 *Requires Restart:* No
 
@@ -350,13 +341,7 @@ Max size of object storage cache.
 
 === cloud_storage_cache_size_percent
 
-Maximum size of the cloud cache.
-
-The property <<cloud_storage_cache_size,`cloud_storage_cache_size`>> controls the same limit expressed as a fixed number of bytes.
-
-NOTE: `cloud_storage_cache_size_percent` overrides `cloud_storage_cache_size`.
-
-*Units*: percentage of total disk size.
+The maximum size of the archival cache as a percentage of unreserved disk space (see disk_reservation_percent). The default value for this option is tuned for a shared disk configuration. When using a dedicated cache disk consider increasing the value.
 
 *Requires Restart:* No
 
@@ -367,6 +352,42 @@ NOTE: `cloud_storage_cache_size_percent` overrides `cloud_storage_cache_size`.
 *Type:* number
 
 *Default:* `20.0`
+
+---
+
+=== cloud_storage_cache_trim_carryover_bytes
+
+The cache performs a recursive directory inspection during the cache trim. The information obtained during the inspection can be carried over to the next trim operation. This parameter sets a limit on the memory occupied by objects that can be carried over from one trim to next, and allows cache to quickly unblock readers before starting the directory inspection.
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* integer
+
+*Accepted values:* [`0`, `4294967295`]
+
+*Default:* `262144`
+
+---
+
+=== cloud_storage_cache_trim_walk_concurrency
+
+The maximum number of concurrent tasks launched for directory walk during cache trimming. A higher number allows cache trimming to run faster but can cause latency spikes due to increased pressure on I/O subsystem and syscall threads.
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* integer
+
+*Accepted values:* [`0`, `65535`]
+
+*Default:* `1`
 
 ---
 
@@ -440,8 +461,6 @@ Number of attempts metadata operations may be retried.
 
 Time interval to wait between cluster metadata uploads.
 
-*Units*: milliseconds.
-
 *Requires Restart:* No
 
 *Nullable:* No
@@ -492,10 +511,7 @@ The hostname to connect to for retrieving role based credentials. Derived from c
 
 === cloud_storage_credentials_source
 
-The source of credentials used to connect to cloud services.
-
-
-*Valid values*: config_file, aws_instance_metadata, sts, gcp_instance_metadata.
+The source of credentials to connect to cloud services.
 
 *Requires Restart:* Yes
 
@@ -573,9 +589,7 @@ Begins the read replica sync loop in tiered-storage-enabled topic partitions. Th
 
 === cloud_storage_disable_tls
 
-Disable TLS for all S3 or GCS connections.
-
-*Type*: boolean.
+Disable TLS for all S3 connections.
 
 *Requires Restart:* No
 
@@ -703,9 +717,7 @@ Enables adjacent segment merging. The segments are reuploaded if there is an opp
 
 === cloud_storage_enabled
 
-Enable object storage. Must be set to `true` to use xref:manage:tiered-storage.adoc[Tiered Storage] or Remote Read Replicas.
-
-*Type*: boolean.
+Enable archival storage.
 
 *Requires Restart:* No
 
@@ -985,9 +997,7 @@ Max https connection idle time (ms).
 
 === cloud_storage_max_connections
 
-Max number of simultaneous connections to S3 per shard. Includes connections used for both uploads and downloads.
-
-*Units*: number of simultaneous connections.
+Max number of simultaneous connections to S3 per shard (includes connections used for both uploads and downloads).
 
 *Requires Restart:* No
 
@@ -1175,9 +1185,7 @@ Validation mode performed before recovering a topic from cloud storage.
 
 === cloud_storage_region
 
-AWS or GCP region that houses the bucket used for storage.
-
-*Type*: string.
+AWS region that houses the bucket used for storage.
 
 *Requires Restart:* No
 
@@ -1229,9 +1237,7 @@ Jitter applied to the cloud storage scrubbing interval.
 
 === cloud_storage_secret_key
 
-AWS or GCP secret key.
-
-*Type*: string.
+AWS secret key.
 
 *Requires Restart:* No
 
@@ -1382,8 +1388,6 @@ Grace period during which the purger will refuse to purge the topic.
 === cloud_storage_trust_file
 
 Path to certificate that should be used to validate server certificate during TLS handshake.
-
-*Type*: string.
 
 *Requires Restart:* No
 

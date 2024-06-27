@@ -11,7 +11,7 @@ For information on how to edit broker properties, see xref:manage:cluster-mainte
 
 === admin
 
-IP address and port of the admin server.
+Address and port of admin server.
 
 *Requires Restart:* Yes
 
@@ -25,7 +25,7 @@ IP address and port of the admin server.
 
 === admin_api_doc_dir
 
-Path to the admin API documentation directory.
+Admin API doc directory.
 
 *Requires Restart:* Yes
 
@@ -41,7 +41,7 @@ Path to the admin API documentation directory.
 
 === admin_api_tls
 
-TLS configuration for the Admin API.
+TLS configuration for admin HTTP server.
 
 *Requires Restart:* Yes
 
@@ -55,18 +55,7 @@ TLS configuration for the Admin API.
 
 === crash_loop_limit
 
-A limit on the number of consecutive times a broker can crash within one hour before its crash-tracking logic is reset. This limit prevents a broker from getting stuck in an infinite cycle of crashes.
-
-If `null`, the property is disabled and no limit is applied.
-
-The crash-tracking logic is reset (to zero consecutive crashes) by any of the following conditions:
-
-* The broker shuts down cleanly.
-* One hour passes since the last crash.
-* The broker configuration file, `redpanda.yaml`, is updated.
-* The `startup_log` file in the broker's <<data_directory,data_directory>> is manually deleted.
-
-*Units*: number of consecutive crashes of a broker.
+Maximum consecutive crashes (unclean shutdowns) allowed after which operator intervention is needed to startup the broker. Limit is not enforced in developer mode.
 
 *Requires Restart:* Yes
 
@@ -84,7 +73,7 @@ The crash-tracking logic is reset (to zero consecutive crashes) by any of the fo
 
 === data_directory
 
-Path to the directory for storing Redpanda's streaming data files.
+Place where redpanda will keep the data.
 
 *Requires Restart:* Yes
 
@@ -100,9 +89,7 @@ Path to the directory for storing Redpanda's streaming data files.
 
 === developer_mode
 
-CAUTION: Enabling `developer_mode` isn't recommended for production use.
-
-Flag to enable developer mode, which skips most of the checks performed at startup.
+Skips most of the checks performed at startup, not recomended for production use.
 
 *Requires Restart:* Yes
 
@@ -134,11 +121,7 @@ Override the cluster enablement setting and disable WebAssembly powered data tra
 
 === empty_seed_starts_cluster
 
-Controls how a new cluster is formed. This property must have the same value in all brokers in a cluster.
-
-If `true`, an empty <<seed_servers,seed_servers>> list denotes that this broker should form a cluster. At most, one broker in the cluster should be configured with an empty seed_servers list. If no such configured broker exists, or if configured to be `false`, then all brokers denoted by the seed_servers list must be identical in their configurations, and those brokers form the initial cluster.
-
-TIP: This is set to `true` by default for backward compatibility, but Redpanda recommends setting `empty_seed_starts_cluster` to `false`.
+If true, an empty seed_servers list will denote that this node should form a cluster. At most one node in the cluster should be configured configured with an empty seed_servers list. If no such configured node exists, or if configured to false, all nodes denoted by the seed_servers list must be identical among those nodes' configurations, and those nodes will form the initial cluster.
 
 *Requires Restart:* Yes
 
@@ -154,7 +137,7 @@ TIP: This is set to `true` by default for backward compatibility, but Redpanda r
 
 === kafka_api
 
-IP address and port of the Kafka API endpoint that handles requests.
+Address and port of an interface to listen for Kafka API requests.
 
 *Requires Restart:* Yes
 
@@ -168,7 +151,7 @@ IP address and port of the Kafka API endpoint that handles requests.
 
 === kafka_api_tls
 
-Transport Layer Security (TLS) configuration for the Kafka API endpoint.
+TLS configuration for Kafka API endpoint.
 
 *Requires Restart:* Yes
 
@@ -198,12 +181,7 @@ Enables log messages for allocations greater than the given size.
 
 === node_id
 
-A number that uniquely identifies the broker within the cluster. If `null` (the default value), Redpanda automatically assigns an ID. If set, it must be non-negative value.
-
-CAUTION: The `node_id` property must not be changed after a broker joins the cluster.
-
-
-*Range*: [0, ...].
+Unique id identifying a node in the cluster. If missing, a unique id will be assigned for this node when it joins the cluster.
 
 *Requires Restart:* Yes
 
@@ -217,7 +195,7 @@ CAUTION: The `node_id` property must not be changed after a broker joins the clu
 
 === rack
 
-A label that identifies a failure zone. Apply the same label to all brokers in the same failure zone. When xref:./cluster-properties.adoc#enable_rack_awareness[enable_rack_awareness] is set to `true` at the cluster level, the system uses the rack labels to spread partition replicas across different failure zones.
+Rack identifier.
 
 *Requires Restart:* Yes
 
@@ -231,7 +209,7 @@ A label that identifies a failure zone. Apply the same label to all brokers in t
 
 === recovery_mode_enabled
 
-If `true`, start Redpanda in xref:manage:recovery-mode.adoc[recovery mode], where user partitions are not loaded and only administrative operations are allowed.
+If true, start redpanda in "metadata only" mode, skipping loading user partitions and allowing only metadata operations.
 
 *Requires Restart:* Yes
 
@@ -247,7 +225,7 @@ If `true`, start Redpanda in xref:manage:recovery-mode.adoc[recovery mode], wher
 
 === rpc_server
 
-IP address and port for the Remote Procedure Call (RPC) server.
+IpAddress and port for RPC server.
 
 *Requires Restart:* Yes
 
@@ -261,7 +239,7 @@ IP address and port for the Remote Procedure Call (RPC) server.
 
 === rpc_server_tls
 
-TLS configuration for the RPC server.
+TLS configuration for RPC server.
 
 *Requires Restart:* Yes
 
@@ -361,6 +339,38 @@ Maximum duration in seconds for verbose (i.e. TRACE or DEBUG) logging. Values co
 
 Schema Registry intro
 
+=== api_doc_dir
+
+API doc directory.
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* `user`
+
+*Type:* string
+
+*Default:* `/usr/share/redpanda/proxy-api-doc`
+
+---
+
+=== mode_mutability
+
+Allow modifying mode.
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* `user`
+
+*Type:* boolean
+
+*Default:* `true`
+
+---
+
 === schema_registry_api
 
 Schema Registry API listen address and port.
@@ -369,7 +379,7 @@ Schema Registry API listen address and port.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Default:* `{address: net::unresolved_address("0.0.0.0", 8081), authn_method: std::nullopt}`
 
@@ -383,7 +393,7 @@ TLS configuration for Schema Registry API.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Default:* `null`
 
@@ -397,7 +407,7 @@ Replication factor for internal _schemas topic.  If unset, defaults to `default_
 
 *Nullable:* Yes
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -421,25 +431,9 @@ Rest API address and port to publish to client.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Default:* `null`
-
----
-
-=== api_doc_dir
-
-API doc directory.
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* `None`
-
-*Type:* string
-
-*Default:* `/usr/share/redpanda/proxy-api-doc`
 
 ---
 
@@ -451,7 +445,7 @@ The maximum number of kafka clients in the LRU cache.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -467,7 +461,7 @@ Time in milliseconds that an idle connection may remain open.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -485,7 +479,7 @@ How long to wait for an idle consumer before removing it.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -503,7 +497,7 @@ Rest API listen address and port.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Default:* `{address: net::unresolved_address("0.0.0.0", 8082), authn_method: std::nullopt}`
 
@@ -517,7 +511,7 @@ TLS configuration for Pandaproxy api.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Default:* `null`
 
@@ -537,7 +531,7 @@ TLS configuration for the brokers.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Default:* `config::tls_config()`
 
@@ -551,7 +545,7 @@ List of address and port of the brokers.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* array
 
@@ -567,7 +561,7 @@ Identifier to use within the kafka request header.
 
 *Nullable:* Yes
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* string
 
@@ -583,7 +577,7 @@ Interval (in milliseconds) for consumer heartbeats.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -601,7 +595,7 @@ Timeout (in milliseconds) for consumer rebalance.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -619,7 +613,7 @@ Max bytes to fetch per request.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -637,7 +631,7 @@ Min bytes to fetch per request.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -655,7 +649,7 @@ Interval (in milliseconds) for consumer request timeout.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -673,7 +667,7 @@ Timeout (in milliseconds) for consumer session.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -691,7 +685,7 @@ Number of acknowledgments the producer requires the leader to have received befo
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -709,7 +703,7 @@ Delay (in milliseconds) to wait before sending batch.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -727,7 +721,7 @@ Number of records to batch before sending to broker.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -745,7 +739,7 @@ Number of bytes to batch before sending to broker.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -763,7 +757,7 @@ Enable or disable compression by the kafka client. Specify 'none' to disable com
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* string
 
@@ -779,7 +773,7 @@ Delay (in milliseconds) to allow for final flush of buffers before shutting down
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -797,7 +791,7 @@ Number of times to retry a request to a broker.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -813,7 +807,7 @@ Delay (in milliseconds) for initial retry backoff.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* integer
 
@@ -831,7 +825,7 @@ The SASL mechanism to use when connecting.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* string
 
@@ -847,7 +841,7 @@ Password to use for SCRAM authentication mechanisms.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* string
 
@@ -863,7 +857,7 @@ Username to use for SCRAM authentication mechanisms.
 
 *Nullable:* No
 
-*Visibility:* `None`
+*Visibility:* `user`
 
 *Type:* string
 
