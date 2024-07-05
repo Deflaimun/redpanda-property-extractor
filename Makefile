@@ -21,7 +21,7 @@ redpanda-git:
 		if [ -z "$(TAG)" ]; then \
 			git pull origin $(TAG); \
 		else \
-			git checkout tags/$(TAG) && git pull; \
+			git checkout dev && git pull; \
 		fi; \
 		git reflog -1; \
 	else \
