@@ -746,16 +746,17 @@
             "visibility": "user"
         },
         "cloud_storage_cache_trim_carryover_bytes": {
-            "default": 262144,
+            "default": 0,
             "defined_in": "src/v/config/configuration.cc",
-            "description": "The cache performs a recursive directory inspection during the cache trim. The information obtained during the inspection can be carried over to the next trim operation. This parameter sets a limit on the memory occupied by objects that can be carried over from one trim to next, and allows cache to quickly unblock readers before starting the directory inspection.",
+            "description": "The cache performs a recursive directory inspection during the cache trim. The information obtained during the inspection can be carried over to the next trim operation. This parameter sets a limit on the memory occupied by objects that can be carried over from one trim to next, and allows cache to quickly unblock readers before starting the directory inspection (deprecated)",
+            "is_deprecated": true,
             "maximum": 4294967295,
             "minimum": 0,
             "name": "cloud_storage_cache_trim_carryover_bytes",
             "needs_restart": false,
             "nullable": false,
-            "type": "integer",
-            "visibility": "tunable"
+            "type": null,
+            "visibility": "deprecated"
         },
         "cloud_storage_cache_trim_threshold_percent_objects": {
             "default": null,
@@ -921,6 +922,16 @@
             "defined_in": "src/v/config/configuration.cc",
             "description": "Begins the read replica sync loop in tiered-storage-enabled topic partitions. The property exists to simplify testing and shouldn't be set in production.",
             "name": "cloud_storage_disable_read_replica_loop_for_tests",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "boolean",
+            "visibility": "tunable"
+        },
+        "cloud_storage_disable_remote_labels_for_tests": {
+            "default": false,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "If 'true', Redpanda disables remote labels and falls back on the hash-based object naming scheme for new topics. This property exists to simplify testing and shouldn't be set in production.",
+            "name": "cloud_storage_disable_remote_labels_for_tests",
             "needs_restart": false,
             "nullable": false,
             "type": "boolean",
@@ -4696,6 +4707,16 @@
             "nullable": false,
             "type": "#/definitions/config::endpoint_tls_config"
         },
+        "schema_registry_normalize_on_startup": {
+            "default": false,
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "Normalize schemas as they are read from the topic on startup.",
+            "name": "schema_registry_normalize_on_startup",
+            "needs_restart": true,
+            "nullable": false,
+            "type": "boolean",
+            "visibility": "user"
+        },
         "schema_registry_replication_factor": {
             "default": null,
             "defined_in": "src/v/pandaproxy/schema_registry/configuration.cc",
@@ -5023,6 +5044,16 @@
             "type": "integer",
             "visibility": "user"
         },
+        "tls_min_version": {
+            "default": "tls_version::v1_2",
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "The minimum TLS version that Redpanda supports.",
+            "name": "tls_min_version",
+            "needs_restart": true,
+            "nullable": false,
+            "type": "tls_version",
+            "visibility": "user"
+        },
         "tm_sync_timeout_ms": {
             "default": "10s",
             "defined_in": "src/v/config/configuration.cc",
@@ -5141,6 +5172,18 @@
             "name": "transaction_coordinator_replication",
             "nullable": false,
             "type": null
+        },
+        "transaction_max_timeout_ms": {
+            "default": "15min",
+            "defined_in": "src/v/config/configuration.cc",
+            "description": "The maximum allowed timeout for transactions. If a client requested transaction timeout exceeds this configuration, the broker will return an error during transactional producer initialization. This guardrail prevents hanging transactions from blocking consumer progress.",
+            "maximum": 17592186044415,
+            "minimum": -17592186044416,
+            "name": "transaction_max_timeout_ms",
+            "needs_restart": false,
+            "nullable": false,
+            "type": "integer",
+            "visibility": "tunable"
         },
         "transactional_id_expiration_ms": {
             "default": "10080min",

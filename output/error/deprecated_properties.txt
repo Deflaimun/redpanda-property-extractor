@@ -1,3 +1,4 @@
+cloud_storage_cache_trim_carryover_bytes
 cloud_storage_max_materialized_segments_per_shard
 cloud_storage_max_partition_readers_per_shard
 cloud_storage_reconciliation_ms

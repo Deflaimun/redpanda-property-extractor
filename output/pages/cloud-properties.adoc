@@ -355,24 +355,6 @@ The maximum size of the archival cache as a percentage of unreserved disk space 
 
 ---
 
-=== cloud_storage_cache_trim_carryover_bytes
-
-The cache performs a recursive directory inspection during the cache trim. The information obtained during the inspection can be carried over to the next trim operation. This parameter sets a limit on the memory occupied by objects that can be carried over from one trim to next, and allows cache to quickly unblock readers before starting the directory inspection.
-
-*Requires Restart:* No
-
-*Nullable:* No
-
-*Visibility:* `tunable`
-
-*Type:* integer
-
-*Accepted values:* [`0`, `4294967295`]
-
-*Default:* `262144`
-
----
-
 === cloud_storage_cache_trim_threshold_percent_objects
 
 Trim is triggered when the cache reaches this percent of the maximum object count. If this is unset, the default behavioris to start trim when the cache is about 100\% full.
@@ -622,6 +604,22 @@ Disable all metadata consistency checks. This will allow redpanda to replay logs
 === cloud_storage_disable_read_replica_loop_for_tests
 
 Begins the read replica sync loop in tiered-storage-enabled topic partitions. The property exists to simplify testing and shouldn't be set in production.
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* boolean
+
+*Default:* `false`
+
+---
+
+=== cloud_storage_disable_remote_labels_for_tests
+
+If 'true', Redpanda disables remote labels and falls back on the hash-based object naming scheme for new topics. This property exists to simplify testing and shouldn't be set in production.
 
 *Requires Restart:* No
 
