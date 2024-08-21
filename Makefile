@@ -18,13 +18,16 @@ clean:
 redpanda-git:
 	if [ -d "./tmp/redpanda" ]; then \
 		cd ./tmp/redpanda && git fetch --tags; \
-		if [ -z "$(TAG)" ]; then \
-			git pull origin $(TAG); \
+		if [ -z "$$TAG" ]; then \
+			echo "TAG is empty, pulling from dev"; \
+			git pull origin; \
 		else \
-			git checkout dev && git pull; \
+			echo "TAG is set to $$TAG, checking out and pulling"; \
+			git checkout $$TAG && git pull; \
 		fi; \
 		git reflog -1; \
 	else \
-		git clone https://github.com/redpanda-data/redpanda.git ./tmp/redpanda --branch $(TAG); \
+		echo "Cloning repository with branch $$TAG"; \
+		git clone https://github.com/redpanda-data/redpanda.git ./tmp/redpanda --branch $$TAG; \
 		git reflog -1; \
 	fi
