@@ -123,7 +123,7 @@ The name of the Azure container to use with Tiered Storage. Note that the contai
 
 === cloud_storage_azure_hierarchical_namespace_enabled
 
-Whether or not Azure Hierarchical Namespaces are enabled on the cloud_storage_azure_storage_account. If this property is not set, cloud_storage_azure_shared_key must be set, and each node will try to determine at startup if HNS is enabled. Setting this property to True will disable the check and assume HNS is active. Setting to False will disable the check and assume that HNS is not active.
+Force Redpanda to use or not use an "Azure Data Lake Storage Gen2 hierarchical namespace" compliant client. When this property is not set, each node infers at startup if HNS is enabled. When set to True, this property disables the check and assumes HNS is enabled. When set to False, this property disables the check and assumes HNS is not enabled. This setting should be used only in emergencies where Redpanda fails to detect the correct HNS status.
 
 *Requires Restart:* Yes
 
@@ -932,6 +932,122 @@ Initial backoff time for exponential backoff algorithm (ms).
 *Accepted values:* [`-17592186044416`, `17592186044415`]
 
 *Default:* `100ms`
+
+---
+
+=== cloud_storage_inventory_based_scrub_enabled
+
+Scrubber uses the latest cloud storage inventory report, if available, to check if the required objects exist in the bucket or container.
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* boolean
+
+*Default:* `false`
+
+---
+
+=== cloud_storage_inventory_hash_store
+
+Directory to store inventory report hashes for use by cloud storage scrubber.
+
+*Requires Restart:* Yes
+
+*Nullable:* Yes
+
+*Visibility:* `user`
+
+*Type:* string
+
+*Default:* `null`
+
+---
+
+=== cloud_storage_inventory_id
+
+The name of the scheduled inventory job created by Redpanda to generate bucket or container inventory reports.
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* string
+
+*Default:* `redpanda_scrubber_inventory`
+
+---
+
+=== cloud_storage_inventory_max_hash_size_during_parse
+
+Maximum bytes of hashes which will be held in memory before writing data to disk during inventory report parsing. Affects the number of files written by inventory service to disk during report parsing, as when this limit is reached new files are written to disk.
+
+*Requires Restart:* No
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* integer
+
+*Accepted values:* [`0`, `18446744073709551615`]
+
+*Default:* `67108864`
+
+---
+
+=== cloud_storage_inventory_report_check_interval_ms
+
+Time interval between checks for a new inventory report in the cloud storage bucket or container.
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* integer
+
+*Accepted values:* [`-17592186044416`, `17592186044415`]
+
+*Default:* `6h`
+
+---
+
+=== cloud_storage_inventory_reports_prefix
+
+The prefix to the path in the cloud storage bucket or container where inventory reports will be placed.
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* string
+
+*Default:* `redpanda_scrubber_inventory`
+
+---
+
+=== cloud_storage_inventory_self_managed_report_config
+
+If enabled, Redpanda will not attempt to create the scheduled report configuration using cloud storage APIs. The scrubbing process will look for reports in the expected paths in the bucket or container, and use the latest report found. Primarily intended for use in testing and on backends where scheduled inventory reports are not supported.
+
+*Requires Restart:* Yes
+
+*Nullable:* No
+
+*Visibility:* `tunable`
+
+*Type:* boolean
+
+*Default:* `false`
 
 ---
 
