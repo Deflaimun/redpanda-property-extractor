@@ -48,7 +48,11 @@ def get_treesitter_cpp_parser_and_language(treesitter_dir, destination_path):
     if not os.path.exists(destination_path):
         build_treesitter_cpp_library(treesitter_dir, destination_path)
 
-    cpp = Language(destination_path, "cpp")
+    # Load the language pointer using the destination path
+    cpp_ptr = Language.load(destination_path)
+
+    # Instantiate Language with the pointer
+    cpp = Language(cpp_ptr, "cpp")
 
     parser = Parser()
     parser.set_language(cpp)
