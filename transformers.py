@@ -52,17 +52,15 @@ class IsArrayTransformer:
 
 class NeedsRestartTransformer:
     def accepts(self, info, file_pair):
-        return (
-            True
-            if len(info["params"]) > 2 and "needs_restart" in info["params"][2]["value"]
-            else False
-        )
-
+        return True
+    
     def parse(self, property, info, file_pair):
-        needs_restart = re.sub(
-            r"^.*::", "", info["params"][2]["value"]["needs_restart"]
-        )
-        property["needs_restart"] = needs_restart == "yes"
+        needs_restart = "yes"
+        if len(info["params"]) > 2 and "needs_restart" in info["params"][2]["value"]:
+            needs_restart = re.sub(
+                r"^.*::", "", info["params"][2]["value"]["needs_restart"]
+            )
+        property["needs_restart"] = needs_restart != "no" # True by default, unless we find "no"
 
 
 class VisibilityTransformer:
