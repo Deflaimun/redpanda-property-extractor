@@ -67,10 +67,24 @@ def get_files_with_properties(file_pairs, treesitter_parser, cpp_language):
         properties = extract_properties_from_file_pair(
             treesitter_parser, cpp_language, fp
         )
+        implementation_value = str(fp.implementation)
 
-        if len(properties) > 0:
-            files_with_properties.append((fp, properties))
-            logging.info(f"Properties found in '{fp.implementation}'.")
+        # List of file paths to check
+        file_paths = [
+            "src/v/config/configuration.cc",
+            "src/v/config/node_config.cc",
+            "src/v/kafka/client/configuration.cc",
+            "src/v/pandaproxy/rest/configuration.cc",
+            "src/v/pandaproxy/schema_registry/configuration.cc"
+        ]
+
+        # Check if any of the paths are in fp.implementation
+        if any(path in implementation_value for path in file_paths):
+            if len(properties) > 0:
+                files_with_properties.append((fp, properties))
+                logging.info(f"Properties found in '{fp.implementation}'.")
+
+    
 
     return files_with_properties
 
@@ -89,6 +103,7 @@ def transform_files_with_properties(files_with_properties):
         NumericBoundsTransformer(type_transformer),
         DurationBoundsTransformer(type_transformer),
         SimpleDefaultValuesTransformer(),
+        ExperimentalTransformer(),
     ]
 
     all_properties = PropertyBag()
