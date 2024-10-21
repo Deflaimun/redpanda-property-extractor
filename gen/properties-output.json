@@ -2464,7 +2464,7 @@
         "enable_leader_balancer": {
             "default": true,
             "defined_in": "src/v/config/configuration.cc",
-            "description": "Enable automatic leadership rebalancing. Mode is set by `leader_balancer_mode`.",
+            "description": "Enable automatic leadership rebalancing.",
             "name": "enable_leader_balancer",
             "needs_restart": false,
             "nullable": false,
@@ -3505,14 +3505,13 @@
             "visibility": "tunable"
         },
         "leader_balancer_mode": {
-            "default": "model::leader_balancer_mode::random_hill_climbing",
             "defined_in": "src/v/config/configuration.cc",
-            "description": "Mode of the leader balancer for optimizing movements of leadership between shards (logical CPU cores). Enabled by `enable_leader_balancer.` Accepted Values: * `random_hill_climbing`: a shard is randomly chosen and leadership is moved to it if the load on the original shard is reduced. * `greedy_balanced_shards`: leadership movement is based on a greedy heuristic of moving leaders from the most loaded shard to the least loaded shard.",
+            "description": null,
+            "is_deprecated": true,
             "name": "leader_balancer_mode",
-            "needs_restart": false,
+            "needs_restart": true,
             "nullable": false,
-            "type": "#/definitions/model::leader_balancer_mode",
-            "visibility": "user"
+            "type": null
         },
         "leader_balancer_mute_timeout": {
             "default": "5min",
