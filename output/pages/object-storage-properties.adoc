@@ -109,7 +109,7 @@ The name of the Azure container to use with Tiered Storage. If `null`, the prope
 
 === cloud_storage_azure_hierarchical_namespace_enabled
 
-Whether or not an Azure hierarchical namespace is enabled on the `cloud_storage_azure_storage_account`. If this property is not set, ´cloud_storage_azure_shared_key` must be set, and each node tries to determine at startup if a hierarchical namespace is enabled. Setting this property to `true` disables the check and treats a hierarchical namespace as active. Setting to `false` disables the check and treats a hierarchical namespace as not active.
+Whether or not an Azure hierarchical namespace is enabled on the `cloud_storage_azure_storage_account`. If this property is not set, Â´cloud_storage_azure_shared_key` must be set, and each node tries to determine at startup if a hierarchical namespace is enabled. Setting this property to `true` disables the check and treats a hierarchical namespace as active. Setting to `false` disables the check and treats a hierarchical namespace as not active.
 
 *Requires restart:* Yes
 

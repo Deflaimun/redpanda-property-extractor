@@ -278,7 +278,6 @@ kafka_throughput_throttling_v2
 kvstore_flush_interval
 kvstore_max_segment_size
 leader_balancer_idle_timeout
-leader_balancer_mode
 leader_balancer_mute_timeout
 leader_balancer_node_mute_timeout
 leader_balancer_transfer_limit_per_shard

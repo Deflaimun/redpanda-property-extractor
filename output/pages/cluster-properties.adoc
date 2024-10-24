@@ -1045,7 +1045,7 @@ Enable idempotent producers.
 
 === enable_leader_balancer
 
-Enable automatic leadership rebalancing. Mode is set by `leader_balancer_mode`.
+Enable automatic leadership rebalancing.
 
 *Requires restart:* No
 
@@ -2387,18 +2387,6 @@ Leadership rebalancing idle timeout.
 
 ---
 
-=== leader_balancer_mode
-
-Mode of the leader balancer for optimizing movements of leadership between shards (logical CPU cores). Enabled by `enable_leader_balancer.` Accepted Values: * `random_hill_climbing`: a shard is randomly chosen and leadership is moved to it if the load on the original shard is reduced. * `greedy_balanced_shards`: leadership movement is based on a greedy heuristic of moving leaders from the most loaded shard to the least loaded shard.
-
-*Requires restart:* No
-
-*Visibility:* `user`
-
-*Default:* `model::leader_balancer_mode::random_hill_climbing`
-
----
-
 === leader_balancer_mute_timeout
 
 Leadership rebalancing mute timeout.
@@ -3261,7 +3249,7 @@ If the number of scheduled tick moves drops by this ratio, a new tick is schedul
 
 === partition_autobalancing_topic_aware
 
-If `true`, Redpanda prioritizes balancing a topic’s partition replica count evenly across all brokers while it’s balancing the cluster’s overall partition count. Because different topics in a cluster can have vastly different load profiles, this better distributes the workload of the most heavily-used topics evenly across brokers.
+If `true`, Redpanda prioritizes balancing a topicâ€™s partition replica count evenly across all brokers while itâ€™s balancing the clusterâ€™s overall partition count. Because different topics in a cluster can have vastly different load profiles, this better distributes the workload of the most heavily-used topics evenly across brokers.
 
 *Requires restart:* No
 
