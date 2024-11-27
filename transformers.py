@@ -288,6 +288,19 @@ class AliasTransformer:
 
         property['aliases'] = aliases
 
+class EnterpriseTransformer:
+    def accepts(self, property,file_pair):
+        if property['type'] is not None and 'enterprise' in property['type']: # Check for enterprise properties
+            return True
+        return False
+    
+    def parse(self, property, info, file_pair):
+        if info['params'] is not None:
+            enterpriseValue = info['params'][0]['value']
+            property['enterprise_value'] = enterpriseValue
+            property['is_enterprise'] = True
+            del info['params'][0]
+
 class MetaParamTransformer:
     def accepts(self, info, file_pair):
         """
