@@ -45,7 +45,7 @@ schema_registry_intro = "The Schema Registry provides configuration properties t
 pandaproxy_intro = "Redpanda HTTP Proxy allows access to your data through a REST API. For example, you can list topics or brokers, get events, produce events, subscribe to events from topics using consumer groups, and commit offsets for a consumer.\n\nSee xref:develop:http-proxy.adoc[]\n\n" 
 kafka_client_intro = "Configuration options for HTTP Proxy Client.\n\n"
 
-cluster_page_title = "= Cluster Configuration Properties \n:page-aliases: reference:tunable-properties.adoc, reference:cluster-properties.adoc\n:description: Cluster configuration properties list. \n\n"
+cluster_page_title = "= Cluster Configuration Properties \n:page-aliases: reference:tunable-properties.adoc, reference:cluster-properties.adoc\n:description: Reference of cluster configuration properties. \n\n"
 cluster_config_intro = "Cluster configuration properties are the same for all brokers in a cluster, and are set at the cluster level.\n\nFor information on how to edit cluster properties, see xref:manage:cluster-maintenance/cluster-property-configuration.adoc[] or xref:manage:kubernetes/k-cluster-property-configuration.adoc[].\n\nNOTE: Some cluster properties require that you restart the cluster for any updates to take effect. See the specific property details to identify whether or not a restart is required.\n\n"
 cluster_config_title = "== Cluster configuration\n\n"
 

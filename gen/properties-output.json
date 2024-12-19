@@ -382,6 +382,8 @@
             "default": false,
             "defined_in": "src/v/config/configuration.cc",
             "description": "Enables or disables audit logging. When you set this to true, Redpanda checks for an existing topic named `_redpanda.audit_log`. If none is found, Redpanda automatically creates one for you.",
+            "enterprise_value": "true",
+            "is_enterprise": true,
             "name": "audit_enabled",
             "needs_restart": false,
             "nullable": false,
@@ -1039,6 +1041,8 @@
             "default": false,
             "defined_in": "src/v/config/configuration.cc",
             "description": "Enable object storage. Must be set to `true` to use Tiered Storage or Remote Read Replicas.",
+            "enterprise_value": "true",
+            "is_enterprise": true,
             "name": "cloud_storage_enabled",
             "needs_restart": true,
             "nullable": false,
@@ -1986,6 +1990,8 @@
             "default": false,
             "defined_in": "src/v/config/configuration.cc",
             "description": "If set to `true`, move partitions between cores in runtime to maintain balanced partition distribution.",
+            "enterprise_value": "true",
+            "is_enterprise": true,
             "name": "core_balancing_continuous",
             "needs_restart": false,
             "nullable": false,
@@ -2250,10 +2256,12 @@
             "default": "config::leaders_preference{}",
             "defined_in": "src/v/config/configuration.cc",
             "description": "Default settings for preferred location of topic partition leaders. It can be either \"none\" (no preference), or \"racks:<rack1>,<rack2>,...\" (prefer brokers with rack id from the list).",
+            "enterprise_value": "[](const config::leaders_preference& v) {          return v != config::leaders_preference{};      }",
+            "is_enterprise": true,
             "name": "default_leaders_preference",
             "needs_restart": false,
             "nullable": false,
-            "type": "config::leaders_preference",
+            "type": "config::leaders_preference>",
             "visibility": "user"
         },
         "default_num_windows": {
@@ -2549,10 +2557,12 @@
             "default": "pandaproxy::schema_registry::schema_id_validation_mode::none",
             "defined_in": "src/v/config/configuration.cc",
             "description": "Mode to enable server-side schema ID validation. Accepted Values: * `none`: Schema validation is disabled (no schema ID checks are done). Associated topic properties cannot be modified. * `redpanda`: Schema validation is enabled. Only Redpanda topic properties are accepted. * `compat`: Schema validation is enabled. Both Redpanda and compatible topic properties are accepted.",
+            "enterprise_value": "std::vector<pandaproxy::schema_registry::schema_id_validation_mode>{        pandaproxy::schema_registry::schema_id_validation_mode::compat,        pandaproxy::schema_registry::schema_id_validation_mode::redpanda,      }",
+            "is_enterprise": true,
             "name": "enable_schema_id_validation",
             "needs_restart": false,
             "nullable": false,
-            "type": "#/definitions/pandaproxy::schema_registry::schema_id_validation_mode",
+            "type": "pandaproxy::schema_registry::schema_id_validation_mode>",
             "visibility": "user"
         },
         "enable_transactions": {
@@ -2829,11 +2839,11 @@
             "visibility": "deprecated"
         },
         "http_authentication": {
-            "default": [
-                "BASIC"
-            ],
+            "default": "std::vector<ss::sstring>{\"BASIC\"}",
             "defined_in": "src/v/config/configuration.cc",
             "description": "A list of supported HTTP authentication mechanisms. Accepted Values: `BASIC`, `OIDC`",
+            "enterprise_value": "OIDC",
+            "is_enterprise": true,
             "items": {
                 "type": "string"
             },
@@ -2889,6 +2899,8 @@
             "default": false,
             "defined_in": "src/v/config/configuration.cc",
             "description": "Enables the translation of topic data into Iceberg tables. Setting iceberg_enabled to true activates the feature at the cluster level, but each topic must also set the redpanda.iceberg.enabled topic-level property to true to use it. If iceberg_enabled is set to false, the feature is disabled for all topics in the cluster, overriding any topic-level settings.",
+            "enterprise_value": "true",
+            "is_enterprise": true,
             "name": "iceberg_enabled",
             "needs_restart": true,
             "nullable": false,
@@ -4341,10 +4353,12 @@
             "default": "model::partition_autobalancing_mode::node_add",
             "defined_in": "src/v/config/configuration.cc",
             "description": "Mode of partition balancing for a cluster. * `node_add`: partition balancing happens when a node is added. * `continuous`: partition balancing happens automatically to maintain optimal performance and availability, based on continuous monitoring for node changes (same as `node_add`) and also high disk usage. This option requires an Enterprise license, and it is customized by `partition_autobalancing_node_availability_timeout_sec` and `partition_autobalancing_max_disk_usage_percent` properties. * `off`: partition balancing is disabled. This option is not recommended for production clusters.",
+            "enterprise_value": "model::partition_autobalancing_mode::continuous",
+            "is_enterprise": true,
             "name": "partition_autobalancing_mode",
             "needs_restart": false,
             "nullable": false,
-            "type": "#/definitions/model::partition_autobalancing_mode",
+            "type": "model::partition_autobalancing_mode>",
             "visibility": "user"
         },
         "partition_autobalancing_movement_batch_size_bytes": {
@@ -4991,7 +5005,7 @@
             "type": null
         },
         "rpc_client_connections_per_peer": {
-            "default": 32,
+            "default": 128,
             "defined_in": "src/v/config/configuration.cc",
             "description": "The maximum number of connections a broker will open to each of its peers.",
             "maximum": 2147483647,
@@ -5190,11 +5204,11 @@
             "type": "string"
         },
         "sasl_mechanisms": {
-            "default": [
-                "SCRAM"
-            ],
+            "default": "std::vector<ss::sstring>{\"SCRAM\"}",
             "defined_in": "src/v/config/configuration.cc",
             "description": "A list of supported SASL mechanisms. Accepted values: `SCRAM`, `GSSAPI`, `OAUTHBEARER`.",
+            "enterprise_value": "std::vector<ss::sstring>{\"GSSAPI\", \"OAUTHBEARER\"}",
+            "is_enterprise": true,
             "items": {
                 "type": "string"
             },
